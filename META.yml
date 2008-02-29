@@ -1,0 +1,47 @@
+---
+name: Config-Model-TkUi
+version: 0.101
+author:
+  - Dominique Dumont (ddumont at cpan dot org)
+abstract: Perl/Tk interface for Config::Model
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+requires:
+  Config::Model: 0.619
+  Exception::Class: 0
+  Log::Log4perl: 0
+  Tk: 0
+  Tk::DirSelect: 0
+provides:
+  Config::Model::Tk::AnyViewer:
+    file: lib/Config/Model/Tk/AnyViewer.pm
+    version: 1.008
+  Config::Model::Tk::CheckListEditor:
+    file: lib/Config/Model/Tk/CheckListEditor.pm
+    version: 1.007
+  Config::Model::Tk::CheckListViewer:
+    file: lib/Config/Model/Tk/CheckListViewer.pm
+    version: 1.004
+  Config::Model::Tk::LeafEditor:
+    file: lib/Config/Model/Tk/LeafEditor.pm
+    version: 1.009
+  Config::Model::Tk::LeafViewer:
+    file: lib/Config/Model/Tk/LeafViewer.pm
+    version: 1.007
+  Config::Model::Tk::ListEditor:
+    file: lib/Config/Model/Tk/ListEditor.pm
+    version: 1.008
+  Config::Model::Tk::ListViewer:
+    file: lib/Config/Model/Tk/ListViewer.pm
+    version: 1.004
+  Config::Model::Tk::NodeViewer:
+    file: lib/Config/Model/Tk/NodeViewer.pm
+    version: 1.002
+  Config::Model::TkUi:
+    file: lib/Config/Model/TkUi.pm
+    version: 1.017
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
