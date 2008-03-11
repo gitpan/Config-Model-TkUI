@@ -1,11 +1,10 @@
 # $Author: ddumont $
-# $Date: 2008/02/15 12:56:57 $
-# $Name:  $
-# $Revision: 1.4 $
+# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
+# $Revision: 537 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
-#    This file is part of Config-Model-TkUi.
+#    This file is part of Config-Model-TkUI.
 #
 #    Config-Model is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Lesser Public License as
@@ -32,7 +31,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::ROText ;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListViewer';
 

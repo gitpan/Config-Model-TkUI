@@ -1,7 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008/02/29 12:37:00 $
-# $Name:  $
-# $Revision: 1.8 $
+# $Date: 2008-03-11 13:50:35 +0100 (Tue, 11 Mar 2008) $
+# $Revision: 538 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -29,16 +28,17 @@ use Carp ;
 
 use Tk::Photo ;
 use Tk::ROText;
+use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 538 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
 
 my %img ;
-*icon_path = *Config::Model::TkUi::icon_path ;
+*icon_path = *Config::Model::TkUI::icon_path ;
 
 sub add_header {
     my ($cw,$type,$item) = @_ ;

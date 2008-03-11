@@ -1,11 +1,10 @@
 # $Author: ddumont $
-# $Date: 2008/02/29 12:37:00 $
-# $Name:  $
-# $Revision: 1.17 $
+# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
+# $Revision: 537 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
-#    This file is part of Config-Model-TkUi.
+#    This file is part of Config-Model-TkUI.
 #
 #    Config-Model is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Lesser Public License as
@@ -21,7 +20,7 @@
 #    along with Config-Model; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
-package Config::Model::TkUi ;
+package Config::Model::TkUI ;
 
 use strict;
 use warnings ;
@@ -47,16 +46,16 @@ use Config::Model::Tk::ListEditor ;
 
 use Config::Model::Tk::NodeViewer ;
 
-$VERSION = sprintf "%d.%03d", q$Revision: 1.17 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
 
-Construct Tk::Widget 'ConfigModelUi';
+Construct Tk::Widget 'ConfigModelUI';
 
 my $warn_img ;
 my $cust_img ;
 
-my $mod_file = 'Config/Model/TkUi.pm' ;
-$icon_path = $INC{'Config/Model/TkUi.pm'} ;
-$icon_path =~ s/TkUi.pm//;
+my $mod_file = 'Config/Model/TkUI.pm' ;
+$icon_path = $INC{'Config/Model/TkUI.pm'} ;
+$icon_path =~ s/TkUI.pm//;
 $icon_path .= 'Tk/icons/' ;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
@@ -83,6 +82,12 @@ sub Populate {
 	$attr =~ s/^-//;
 	$cw->{$attr} = delete $args->{$parm} 
 	  or croak "Missing $parm arg\n";
+    }
+
+    foreach my $parm (qw/-store_sub/) {
+	my $attr = $parm ;
+	$attr =~ s/^-//;
+	$cw->{$attr} = delete $args->{$parm} ;
     }
 
     # check unknown parameters
@@ -202,7 +207,7 @@ Tree usage (left hand side of widget)
 Editor widget usage
 
 When clicking on store, the new data is stored in the tree represented
-on the left side of TkUi. The new data will be stored in the
+on the left side of TkUI. The new data will be stored in the
 configuration file only when "File->save" menu is invoked.
 
 EOF
@@ -226,7 +231,7 @@ sub add_help_menu {
 
     my $about_sub = sub {
 	$cw->Dialog(-title => 'About',
-		    -text => "Config::Model::TkUi \n"
+		    -text => "Config::Model::TkUI \n"
 		    ."(c) 2008 Dominique Dumont \n"
 		    ."Licensed under LGPLv2\n"
 		   ) -> Show ;
@@ -284,8 +289,14 @@ sub save {
     my $cw = shift ;
     my $dir = shift ;
     my $trace_dir = defined $dir ? $dir : 'default' ;
-    $logger->info( "Saving data in $trace_dir directory" );
-    $cw->{root}->instance->write_back($dir);
+    if (defined $cw->{store_sub}) {
+	$logger->info( "Saving data in $trace_dir directory with store call-back" );
+	$cw->{store_sub}->($dir) ;
+    }
+    else {
+	$logger->info( "Saving data in $trace_dir directory with instance write_back" );
+	$cw->{root}->instance->write_back($dir);
+    }
     $cw->{modified_data} = 0 ;
 }
 
@@ -300,7 +311,8 @@ sub quit {
 				)->Show ;
 	$cw->save if $answer eq 'yes';
     }
-    exit ;
+    # destroy main window to exit Tk Mainloop;
+    $cw->parent->destroy ;
 }
 
 sub reload {
@@ -623,11 +635,11 @@ __END__
 
 =head1 NAME
 
-Config::Model::TkUi - Perl/Tk widget to edit content of Config::Model
+Config::Model::TkUI - Perl/Tk widget to edit content of Config::Model
 
 =head1 SYNOPSIS
 
- use Config::Model::TkUi;
+ use Config::Model::TkUI;
 
  # init trace
  Log::Log4perl->easy_init($WARN);
@@ -641,7 +653,7 @@ Config::Model::TkUi - Perl/Tk widget to edit content of Config::Model
  # Tk part
  my $mw = MainWindow-> new ;
  $mw->withdraw ;
- $mw->ConfigModelUi (-root => $root) ;
+ $mw->ConfigModelUI (-root => $root) ;
 
  MainLoop ;
 
@@ -676,12 +688,12 @@ Right-click on any item to open an editor widget
 =head2 Editor widget
 
 When clicking on store, the new data is stored in the tree represented
-on the left side of TkUi. The new data will be stored in the
+on the left side of TkUI. The new data will be stored in the
 configuration file only when C<File->save> menu is invoked.
 
 =head2 TODO
 
-Document widget options.
+Document widget options. (-root_model and -store_sub)
 
 =head1 AUTHOR
 

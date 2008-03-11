@@ -1,8 +1,8 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008/02/26 13:31:34 $
-# $Name:  $
-# $Revision: 1.6 $
+# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
+# $Name: not supported by cvs2svn $
+# $Revision: 537 $
 use warnings FATAL => qw(all);
 
 use ExtUtils::testlib;
