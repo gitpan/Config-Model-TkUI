@@ -1,6 +1,6 @@
 ---
 name: Config-Model-TkUI
-version: 0.102
+version: 0.103
 author:
   - Dominique Dumont (ddumont at cpan dot org)
 abstract: Perl/Tk interface for Config::Model
