@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 537 $
+# $Date: 2008-03-24 15:06:55 +0100 (Mon, 24 Mar 2008) $
+# $Revision: 560 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 560 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -40,11 +40,12 @@ my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
+my $entry_width = 20 ;
+
 sub ClassInit {
     my ($cw, $args) = @_;
     # ClassInit is often used to define bindings and/or other
     # resources shared by all instances, e.g., images.
-
     # cw->Advertise(name=>$widget);
 }
 
@@ -70,7 +71,11 @@ sub Populate {
 					 -height => 8,
 				       )
                             -> pack(@fbe1, -side => 'left') ;
-    $tklist->insert( end => $list->get_all_indexes) ;
+
+    my $cargo_type = $list->cargo_type ;
+    my @insert = $cargo_type eq 'leaf' ? $list->fetch_all_values 
+               :                         $list->get_all_indexes ;
+    $tklist->insert( end => @insert ) ;
 
     my $right_frame = $elt_button_frame->Frame->pack(@fxe1, -side => 'left');
 
@@ -79,40 +84,49 @@ sub Populate {
     $cw->add_help(class   => $list->parent->get_help) ;
     $cw->add_help(element => $list->parent->get_help($list->element_name)) ;
 
-    my $add_item = '';
-    my $add_frame = $right_frame->Frame->pack( @fxe1);
+    if ($cargo_type eq 'leaf') {
+	my $set_item = '';
+	my $set_sub = sub {$cw->set_entry($set_item); $set_item = '';} ;
+	my $set_frame = $right_frame->Frame->pack( @fxe1);
 
-    my $add_str = $list->ordered ? "after selection " : '' ;
-    $add_frame -> Button(-text => "Add item $add_str:",
-			 -command => sub {$cw->add_entry($add_item);},
-			 -anchor => 'e',
-			)->pack(-side => 'left', @fxe1);
-    $add_frame -> Entry (-textvariable => \$add_item, -width => 10)
-               -> pack  (-side => 'left') ;
+	$set_frame -> Button(-text => "set selected item:",
+			     -command => $set_sub ,
+			     -anchor => 'e',
+			    )->pack(-side => 'left', @fxe1);
+	$set_frame -> Entry (-textvariable => \$set_item, 
+			     -width => $entry_width)
+	  -> pack  (-side => 'left') ;
 
-    my $cp_frame = $right_frame->Frame->pack( @fxe1);
-    my $cp_item = '';
-    $cp_frame -> Button(-text => 'Copy selected item into:',
-			-command => sub {$cw->copy_selected_in($cp_item);},
-			-anchor => 'e',
-		       )
-              -> pack(-side => 'left', @fxe1);
-    $cp_frame -> Entry (-textvariable => \$cp_item, -width => 10)
-              -> pack  (-side => 'left') ;
+	my $push_item = '' ;
+	my $push_sub = sub {$cw->push_entry($push_item); $push_item = '';} ;
+	my $push_frame = $right_frame->Frame->pack( @fxe1);
+	$push_frame -> Button(-text => "push item:",
+			      -command => $push_sub ,
+			      -anchor => 'e',
+			     )->pack(-side => 'left', @fxe1);
+	$push_frame -> Entry (-textvariable => \$push_item, 
+			      -width => $entry_width)
+	    -> pack  (-side => 'left') ;
+
+	# move up and down don't make much sense for list of nodes...
+	$right_frame->Button(-text => 'Move selected up',
+			     -command => sub { $cw->move_up ;} ,
+			    )-> pack( @fxe1);
+	$right_frame->Button(-text => 'Move selected down',
+			     -command => sub { $cw->move_down ;} ,
+			    )-> pack( @fxe1);
+    }
+    else {
+	my $disp = $cargo_type ;
+	$disp .= ' ('.$list->config_class_name.')' if $cargo_type eq 'node' ;
+	$right_frame->Button(-text => "Push new $disp",
+			     -command => sub { $cw->push_entry('') ;} ,
+			    )-> pack( @fxe1);
+    }
 
 
-    my $mv_frame = $right_frame->Frame->pack( @fxe1);
-    my $mv_item = '';
-    $mv_frame -> Button(-text => 'Move selected item into:',
-			-command => sub {$cw->move_selected_to($mv_item);},
-		      	-anchor => 'e',
-		       )
-              -> pack(-side => 'left', @fxe1);
-    $mv_frame -> Entry (-textvariable => \$mv_item, -width => 10)
-              -> pack  (-side => 'left') ;
-
-    $right_frame->Button(-text => 'Delete selected',
-			 -command => sub { $cw->delete_selection ;} ,
+    $right_frame->Button(-text => 'Remove selected',
+			 -command => sub { $cw->remove_selection ;} ,
 			)-> pack( @fxe1);
 
     $right_frame -> Button ( -text => 'Remove all elements',
@@ -123,30 +137,31 @@ sub Populate {
 			   ) -> pack(-side => 'left', @fxe1) ;
 
     $cw->{tklist} = $tklist ;
+
     $cw->Tk::Frame::Populate($args) ;
 }
 
-sub add_entry {
+sub push_entry {
     my $cw = shift;
     my $add = shift;
     my $tklist = $cw->{tklist} ;
     my $list = $cw->{list};
 
-    $logger->debug("add_entry: $add");
+    $logger->debug("push_entry: $add");
 
-    if ($list->exists($add)) {
-	$cw->Dialog(-title => "Add item error",
-		    -text  => "Entry $add already exists",
-		   )
-           ->Show() ;
-	return 0;
+    my $cargo_type = $list->cargo_type ;
+    if ($cargo_type eq 'leaf') {
+	return unless $add;
+	eval {$list->push($add) ;};
+    }
+    else {
+	# create new item in list (may auto create node object)
+	my @idx = $list -> get_all_indexes ;
+	eval {$list->fetch_with_id(scalar @idx)} ;
     }
 
-    # add entry in list
-    eval {$list->fetch_with_id($add)} ;
-
     if ($@) {
-	$cw -> Dialog ( -title => 'List index error',
+	$cw -> Dialog ( -title => 'List index error with type $cargo_type',
 			-text  => $@,
 		      )
 	  -> Show ;
@@ -156,67 +171,90 @@ sub add_entry {
 	$cw->reload_tree;
     }
 
-    $logger->debug( "new list idx: ". join(',',$list->get_all_indexes));
+    my @new_idx = $list->get_all_indexes ;
+    $logger->debug("new list idx: ". join(',',@new_idx));
 
-    # ensure correct order for ordered hash
-    my @selected = $tklist->curselection() ;
-    if (@selected and $list->ordered) {
-	my $idx = $tklist->get($selected[0]);
-	$list->swap($idx, $add) ;
-    }
+    my $insert = $cargo_type eq 'leaf' ? $add : $#new_idx ;
+    $tklist->insert('end',$insert);
 
-    # add entry in tklist
-    if ($list->ordered) {
-	$tklist->insert($selected[0]+1 || 0,$add) ;
-    }
-    else {
-	my $idx = 0;
-	foreach ($tklist->get(0,'end')) {
-	    if ($add lt $_) {
-		$tklist->insert($idx,$add);
-		last;
-	    }
-	    $idx ++ ;
-	}
-	$tklist->insert($idx,$add) if $idx == 0; # first entry
-    }
     return 1 ;
 }
 
-sub copy_selected_in {
+sub set_entry {
     my $cw =shift;
-    my $to_name = shift ;
+    my $data = shift ;
+
     my $tklist = $cw->{tklist} ;
-    my $from_idx = $tklist->curselection() ;
-    my $from_name = $tklist->get($from_idx);
-    my $list = $cw->{list};
-    $cw->add_entry($to_name) or return ;
-    $list->copy($from_name,$to_name) ;
+    my $idx_ref = $tklist->curselection() ;
+    return unless defined $idx_ref;
+    return unless @$idx_ref ;
+
+    my $idx = $idx_ref->[0] ;
+    return unless $idx ;
+    $tklist->delete($idx) ;
+    $tklist->insert($idx, $data) ;
+    $tklist->selectionSet($idx ) ;
+    $cw->{list}->fetch_with_id($idx)->store($data) ;
     $cw->reload_tree ;
 }
 
-sub move_selected_to {
+
+sub move_up {
     my $cw =shift;
-    my $to_name = shift ;
+
     my $tklist = $cw->{tklist} ;
-    my $from_idx = $tklist->curselection() ;
-    my $from_name = $tklist->get($from_idx);
-    $logger->debug( "move_selected_to: from $from_name to $to_name" );
+    my $from_idx_ref = $tklist->curselection() ;
+
+    return unless defined $from_idx_ref;
+    return unless @$from_idx_ref ;
+
+    my $from_idx = $from_idx_ref->[0] ;
+    return unless $from_idx ;
+
+    $cw->swap($from_idx , $from_idx - 1) ;
+}
+
+sub move_down {
+    my $cw =shift;
+
+    my $tklist = $cw->{tklist} ;
+    my $from_idx_ref = $tklist->curselection() ;
+
+    return unless defined $from_idx_ref;
+    return unless @$from_idx_ref ;
+
+    my $from_idx = $from_idx_ref->[0] ;
+
+    $cw->swap($from_idx , $from_idx + 1) ;
+}
+
+sub swap {
+    my ($cw, $ida, $idb ) = @_ ;
+
+    my $tklist = $cw->{tklist} ;
+
     my $list = $cw->{list};
-    $tklist -> delete($from_idx) ;
-    $cw->add_entry($to_name) or return ;
-    $list->move($from_name,$to_name) ;
+    $list->swap($ida , $idb) ;
+
+    my $old = $tklist->get($ida) ;
+    $tklist->delete($ida) ;
+
+    while ($idb > $tklist->size) {
+	$tklist->insert('end','<undef>') ;
+    }
+    $tklist->insert($idb, $old) ;
+    $tklist->selectionSet($idb ) ;
     $cw->reload_tree ;
 }
 
-sub delete_selection {
+sub remove_selection {
     my $cw = shift ;
     my $tklist = $cw->{tklist} ;
     my $list = $cw->{list};
 
     foreach ($tklist->curselection()) {
-	my $idx = $tklist->get($_) ;
-	$list   -> delete($idx) ;
+	$logger->debug( "remove_selection: removing index $_" );
+	$list   -> remove($_) ;
 	$tklist -> delete($_) ;
 	$cw->reload_tree ;
     }

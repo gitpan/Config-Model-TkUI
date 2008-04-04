@@ -1,8 +1,7 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
-# $Name: not supported by cvs2svn $
-# $Revision: 537 $
+# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
+# $Revision: 573 $
 use warnings FATAL => qw(all);
 
 use ExtUtils::testlib;
@@ -60,6 +59,8 @@ hash_a:"ti ti"="ti ti value"
 ordered_hash:z=1
 ordered_hash:y=2
 ordered_hash:x=3
+ordered_hash_of_nodes:N1 X=Av -
+ordered_hash_of_nodes:N2 X=Bv -
 lista=a,b,c,d
 olist:0 X=Av -
 olist:1 X=Bv -
@@ -92,6 +93,10 @@ my $mgr   = $cmu->Subwidget('multi_mgr') ;
 
 my @test 
   = (
+     sub { $cmu->create_element_widget('view','test1')},
+     sub { $tktree->open('test1.lista') },
+     sub { $cmu->create_element_widget('edit','test1.std_id');},
+     sub { $cmu->{editor}->add_entry('e')},
      sub { $tktree->open('test1.std_id') },
      sub { $cmu->reload} ,
      sub { $cmu->create_element_widget('view','test1.std_id')},
@@ -99,6 +104,7 @@ my @test
      sub { $tktree->open('test1.std_id.ab') },
      sub { $cmu->create_element_widget('view','test1.std_id.ab.Z')},
      sub { $root->load(step => "std_id:ab Z=Cv") ; $cmu->reload ;},
+     sub { $tktree->open('test1.std_id.ab') },
      sub { $cmu->create_element_widget('edit','test1.std_id.ab.DX')},
      sub { $root->load(step => "std_id:ab3") ; $cmu->reload ;} ,
      sub { $cmu->create_element_widget('view','test1.string_with_def')},

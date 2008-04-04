@@ -1,14 +1,14 @@
 ---
 name: Config-Model-TkUI
-version: 0.103
+version: 0.104
 author:
   - Dominique Dumont (ddumont at cpan dot org)
-abstract: Perl/Tk interface for Config::Model
+abstract: Tk GUI to edit config data through Config::Model
 license: lgpl
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
 requires:
-  Config::Model: 0.619
+  Config::Model: 0.621
   Exception::Class: 0
   Log::Log4perl: 0
   Tk: 0
@@ -16,31 +16,37 @@ requires:
 provides:
   Config::Model::Tk::AnyViewer:
     file: lib/Config/Model/Tk/AnyViewer.pm
-    version: 1.0538
+    version: 1.0564
   Config::Model::Tk::CheckListEditor:
     file: lib/Config/Model/Tk/CheckListEditor.pm
     version: 1.0537
   Config::Model::Tk::CheckListViewer:
     file: lib/Config/Model/Tk/CheckListViewer.pm
     version: 1.0537
+  Config::Model::Tk::HashEditor:
+    file: lib/Config/Model/Tk/HashEditor.pm
+    version: 1.0573
+  Config::Model::Tk::HashViewer:
+    file: lib/Config/Model/Tk/HashViewer.pm
+    version: 1.0555
   Config::Model::Tk::LeafEditor:
     file: lib/Config/Model/Tk/LeafEditor.pm
-    version: 1.0537
+    version: 1.0573
   Config::Model::Tk::LeafViewer:
     file: lib/Config/Model/Tk/LeafViewer.pm
     version: 1.0537
   Config::Model::Tk::ListEditor:
     file: lib/Config/Model/Tk/ListEditor.pm
-    version: 1.0537
+    version: 1.0560
   Config::Model::Tk::ListViewer:
     file: lib/Config/Model/Tk/ListViewer.pm
-    version: 1.0537
+    version: 1.0558
   Config::Model::Tk::NodeViewer:
     file: lib/Config/Model/Tk/NodeViewer.pm
-    version: 1.0537
+    version: 1.0564
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.0537
+    version: 1.0582
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

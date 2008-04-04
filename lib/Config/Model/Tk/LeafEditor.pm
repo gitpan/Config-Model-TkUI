@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 537 $
+# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
+# $Revision: 573 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl;
 use base qw/Config::Model::Tk::LeafViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 573 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 
@@ -128,8 +128,8 @@ sub add_buttons {
     $bframe -> Button ( -text => 'Reset',
 			-command => sub { $cw->reset_value ; },
 		      ) -> pack(-side => 'left') ;
-    $bframe -> Button ( -text => 'Try ??',
-			-command => sub { $cw->try},
+    $bframe -> Button ( -text => 'Delete',
+			-command => sub { $cw->delete},
 		      ) -> pack(-side => 'left') ;
     $bframe -> Button ( -text => 'Store',
 			-command => sub { $cw->store},
@@ -168,6 +168,22 @@ sub try {
     }
 }
 
+sub delete {
+    my $cw = shift ;
+    eval {$cw->{leaf}->store(undef); } ;
+
+    if ($@) {
+	$cw -> Dialog ( -title => 'Delete error',
+			-text  => "$@",
+		      )
+            -> Show ;
+    }
+    else {
+	# trigger redraw of Tk Tree
+	$cw->parent->parent->parent->parent->reload(1) ;
+    }
+}
+
 sub store {
     my $cw = shift ;
     my $v = $cw->try ;
@@ -177,7 +193,7 @@ sub store {
 
     if ($@) {
 	$cw -> Dialog ( -title => 'Value error',
-			-text  => $@,
+			-text  => "$@",
 		      )
             -> Show ;
 	$cw->reset_value ;

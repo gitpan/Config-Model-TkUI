@@ -1,8 +1,8 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
+# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
 # $Name: not supported by cvs2svn $
-# $Revision: 537 $
+# $Revision: 573 $
 
 # this file is used by test script
 
@@ -117,6 +117,12 @@
 				 cargo_type => 'leaf',
 				 cargo_args => {value_type => 'uniline'},
 			       },
+	       ordered_hash_of_nodes => { type => 'hash',
+					  index_type => 'string',
+					  ordered => 1 ,
+					  cargo_type => 'node',
+					  config_class_name => 'SlaveZ'
+					},
 	       olist => { type => 'list',
 			  cargo_type => 'node',
 			  config_class_name => 'SlaveZ' ,

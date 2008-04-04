@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:50:35 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 538 $
+# $Date: 2008-03-28 13:31:04 +0100 (Fri, 28 Mar 2008) $
+# $Revision: 564 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 538 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 564 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -51,11 +51,17 @@ sub add_header {
     my $idx ;
     $idx = $item->index_value if $item->can('index_value' ) ;
     my $elt_name = $item->composite_name ;
-    my $class = $item->parent->config_class_name ;
+
+    my $parent = $item->parent ;
+    my $class = defined $parent ? $item->parent->config_class_name 
+              :                   $item->config_class_name ;
+
+    my $label = "$type: Class $class";
+    $label .= "- Element $elt_name" if defined $parent ;
     my $f = $cw -> Frame -> pack (@fxe1);
-    $f -> Label ( -text => "$type: Class $class - Element $elt_name",
-			    -anchor => 'w' )
-              -> pack (-side => 'left', @fxe1);
+
+    $f -> Label ( -text => $label, -anchor => 'w' )
+       -> pack  (-side => 'left', @fxe1);
 
     $f -> Label (-image => $img{lc($type)} , -anchor => 'e') 
       -> pack (-side => 'left');

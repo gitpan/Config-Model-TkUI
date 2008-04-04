@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:50:35 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 538 $
+# $Date: 2008-03-22 18:57:28 +0100 (Sat, 22 Mar 2008) $
+# $Revision: 557 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -29,11 +29,11 @@ my $build = Module::Build->new
   (
    module_name => 'Config::Model::TkUI',
    license => 'lgpl',
-   dist_abstract => "Perl/Tk interface for Config::Model",
+   dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
-   dist_version  => '0.103' ,
+   dist_version  => '0.104' ,
    requires => {
-		'Config::Model'    => '0.619',
+		'Config::Model'    => '0.621',
 		'Exception::Class' => 0,
 		'Tk'               => 0,
 		'Tk::DirSelect'    => 0,

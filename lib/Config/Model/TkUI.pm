@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 537 $
+# $Date: 2008-04-03 19:10:35 +0200 (Thu, 03 Apr 2008) $
+# $Revision: 582 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -35,6 +35,8 @@ use Log::Log4perl;
 use Tk::Photo ;
 use Tk::DialogBox ;
 
+require Tk::ErrorDialog;
+
 use Config::Model::Tk::LeafEditor ;
 use Config::Model::Tk::CheckListEditor ;
 
@@ -44,9 +46,13 @@ use Config::Model::Tk::CheckListViewer ;
 use Config::Model::Tk::ListViewer ;
 use Config::Model::Tk::ListEditor ;
 
+use Config::Model::Tk::HashViewer ;
+use Config::Model::Tk::HashEditor ;
+
 use Config::Model::Tk::NodeViewer ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
+
+$VERSION = sprintf "1.%04d", q$Revision: 582 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -54,7 +60,7 @@ my $warn_img ;
 my $cust_img ;
 
 my $mod_file = 'Config/Model/TkUI.pm' ;
-$icon_path = $INC{'Config/Model/TkUI.pm'} ;
+$icon_path = $INC{$mod_file} ;
 $icon_path =~ s/TkUI.pm//;
 $icon_path .= 'Tk/icons/' ;
 
@@ -105,6 +111,7 @@ sub Populate {
     $cw->configure(-menu => $menubar ) ;
 
     my $file_items = [[ qw/command reload -command/, sub{ $cw->reload }],
+		      [ qw/command check  -command/, sub{ $cw->check(1)}],
 		      [ qw/command save   -command/, sub{ $cw->save }],
 		      [ command => 'save in dir ...',
                         -command => sub{ $cw->save_in_dir ;} ],
@@ -281,14 +288,32 @@ sub open_item {
 sub save_in_dir {
     my $cw = shift ;
     require Tk::DirSelect ;
-    my $dir = $cw->DirSelect()->Show ;
-    $cw->save($dir) ;
+    $cw->{save_dir} = $cw->DirSelect()->Show ;
+    $cw->save() ;
+}
+
+sub check {
+    my $cw = shift ;
+    my $show = shift || 0 ;
+
+    # first check for errors, will die on errors
+    print $cw->{root}->dump_tree(auto_vivify => 1) ;
+
+    if ($show) {
+	$cw->Dialog(-title => 'Check',
+		    -text => "No errors found"
+		   ) -> Show ;
+    }
 }
 
 sub save {
     my $cw = shift ;
-    my $dir = shift ;
+
+    my $dir = $cw->{save_dir} ;
     my $trace_dir = defined $dir ? $dir : 'default' ;
+
+    $cw->check() ;
+
     if (defined $cw->{store_sub}) {
 	$logger->info( "Saving data in $trace_dir directory with store call-back" );
 	$cw->{store_sub}->($dir) ;
@@ -417,7 +442,7 @@ sub disp_obj_elt {
 	weaken( $data[1] );
 
 	unless ($tkt->infoExists($newpath)) {
-	    my @opt = $prevpath ? (-after => $prevpath) : () ;
+	    my @opt = $prevpath ? (-after => $prevpath) : (-at => 0 ) ;
 	    my $elt_type = $node->element_type($elt) ;
 	    my $newmode = $elt_mode{$elt_type};
 	    $logger->trace( "disp_obj_elt add $newpath mode $newmode type $elt_type" );
@@ -444,21 +469,39 @@ sub disp_hash {
     $cw->prune($path,@idx) ;
 
     my $elt = $node -> fetch_element($element_name) ;
+    my $elt_type = $elt->get_cargo_type();
 
     my $prevpath = '' ;
+    my $idx_nb = 0 ; # used to keep track of tktree item order
     foreach my $idx (@idx) {
 	my $newpath = $path.'.'. to_path($idx) ;
 	my $scan_sub = sub {
 	    $scanner->scan_hash([$newpath,$cw,@_],$node, $element_name,$idx);
 	};
-	my @data = ( $scan_sub, $elt->fetch_with_id($idx) );
-	weaken($data[1]) ;
 
-	unless ($tkt->infoExists($newpath)) {
-	    my @opt = $prevpath ? (-after => $prevpath) : () ;
-	    my $elt_type = $elt->get_cargo_type();
-	    my $newmode = $elt_mode{$elt_type};
+	my $newmode = $elt_mode{$elt_type};
+
+	if ($tkt->infoExists($newpath) ) {
+	    my $previous_data = $tkt->info(data => $newpath);
+	    my $previous_idx_nb = $previous_data->[2] ;
+	    if ($idx_nb != $previous_idx_nb) {
+		$newmode = $tkt->getmode($newpath); # will reuse mode below
+		print( "disp_hash delete $newpath mode $newmode (got idx "
+		       .$previous_idx_nb 
+		       ." expected $idx_nb)\n" );
+		$logger->trace( "disp_hash delete $newpath mode $newmode (got "
+				.$previous_idx_nb
+				." expected $idx_nb)" );
+		# wrong order, delete the entry
+		$tkt->delete(entry => $newpath) ;
+	    }
+	}
+
+	if (not $tkt->infoExists($newpath)) {
+	    my @opt = $prevpath ? (-after => $prevpath) : (-at => 0 ) ;
 	    $logger->trace( "disp_hash add $newpath mode $newmode cargo_type $elt_type" );
+	    my @data = ( $scan_sub, $elt->fetch_with_id($idx), $idx_nb );
+	    weaken($data[1]) ;
 	    $tkt->add($newpath, -data => \@data, @opt) ;
 	    $tkt->itemCreate($newpath,0, -text => $idx ) ;
 	    $tkt -> setmode($newpath => $newmode) ;
@@ -469,9 +512,10 @@ sub disp_hash {
 
 	my $idx_mode = $tkt->getmode($newpath) ;
 	$logger->trace( "disp_hash   sub path $newpath is mode $idx_mode" );
-	$scan_sub->(0) if ($opening or $idx_mode eq 'close') ;
+	$scan_sub->(0) if ($opening or $idx_mode ne 'open') ;
 
 	$prevpath = $newpath ;
+	$idx_nb++ ;
     } ;
 }
 
@@ -513,6 +557,14 @@ sub disp_leaf {
     else {
 	# remove image when value is identical to standard value
 	$tkt->itemDelete($path,1) if $tkt->itemExists($path,1) ;
+    }
+
+    if (defined $value) {
+	$value =~ s/\n/ /g;
+
+	if (length($value) > 15  ) {
+	    $value = substr($value,0,15) . '...' ;
+	}
     }
 
     $tkt->itemCreate($path,2, -text => $value) ;
@@ -574,14 +626,14 @@ my %widget_table = (
 			     leaf       => 'ConfigModelLeafEditor',
 			     check_list => 'ConfigModelCheckListEditor',
 			     list       => 'ConfigModelListEditor',
-			     hash       => 'ConfigModelListEditor',
+			     hash       => 'ConfigModelHashEditor',
 			     node       => 'ConfigModelNodeViewer',
 			    },
 		    view => {
 			     leaf       => 'ConfigModelLeafViewer',
 			     check_list => 'ConfigModelCheckListViewer',
 			     list       => 'ConfigModelListViewer',
-			     hash       => 'ConfigModelListViewer',
+			     hash       => 'ConfigModelHashViewer',
 			     node       => 'ConfigModelNodeViewer',
 			    },
 		   ) ;
@@ -620,8 +672,9 @@ sub create_element_widget {
 
     my $widget = $widget_table{$mode}{$type} 
       || die "Cannot find $mode widget for type $type";
-    $frame -> $widget(-item => $obj, -path => $tree_path )
-           -> pack(-expand => 1, -fill => 'both') ;
+    $cw->{editor} = $frame -> $widget(-item => $obj, -path => $tree_path ) ;
+    $cw->{editor}-> pack(-expand => 1, -fill => 'both') ;
+    return $cw->{editor} ;
 }
 
 sub get_perm {
@@ -635,7 +688,7 @@ __END__
 
 =head1 NAME
 
-Config::Model::TkUI - Perl/Tk widget to edit content of Config::Model
+Config::Model::TkUI - Tk GUI to edit config data through Config::Model
 
 =head1 SYNOPSIS
 
