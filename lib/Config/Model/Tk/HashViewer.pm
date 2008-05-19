@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-21 17:22:57 +0100 (Fri, 21 Mar 2008) $
-# $Revision: 555 $
+# $Date: 2008-04-25 14:04:19 +0200 (Fri, 25 Apr 2008) $
+# $Revision: 630 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 555 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 630 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelHashViewer';
 
@@ -55,13 +55,13 @@ sub Populate {
     $cw->add_header(View => $hash) ;
 
     my $inst = $hash->instance ;
-    $inst->push_no_value_check('fetch') ;
 
-    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
+    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 2/)->pack(@fxe1) ;
     my $str =  $hash->element_name.' '.$hash->get_type .' elements' ;
     $elt_frame -> Label(-text => $str) -> pack() ;
 
     my $rt = $elt_frame ->Scrolled ( 'ROText',
+				     -scrollbars => 'oe',
 				     -height => 10,
 				   ) ->pack(@fbe1) ;
 

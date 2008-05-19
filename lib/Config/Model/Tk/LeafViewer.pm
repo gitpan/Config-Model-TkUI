@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 537 $
+# $Date: 2008-05-15 14:00:38 +0200 (Thu, 15 May 2008) $
+# $Revision: 664 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,12 +30,14 @@ use Log::Log4perl ;
 use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 664 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafViewer';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill x  / ;
+
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
 sub ClassInit {
@@ -60,15 +62,24 @@ sub Populate {
     $logger->info("Creating leaf viewer for value_type $vt");
     my $v = $leaf->fetch ;
 
+    $inst->pop_no_value_check ;
+
     $cw->add_header(View => $leaf) ;
 
-    my $lv_frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
+    my @pack_args = @fx ;
+    @pack_args = @fbe1 if $vt eq 'string' or $vt eq 'enum' 
+                       or $vt eq 'reference' ;
+    my $lv_frame = $cw->Frame(qw/-relief raised -borderwidth 2/)
+      ->pack(@pack_args) ;
     $lv_frame -> Label(-text => 'Value') -> pack() ;
-    
+
     if ($vt eq 'string') {
 	require Tk::ROText ;
-	$cw->{e_widget} = $lv_frame->ROText(-height => 10 )
-                                  ->pack(@fxe1);
+	$cw->{e_widget} = $lv_frame->Scrolled ('ROText',
+					       -height => 5,
+					       -scrollbars => 'ow',
+					      )
+	  ->pack(@fbe1);
 	$cw->{e_widget}->insert('end',$v) ;
     }
     else {

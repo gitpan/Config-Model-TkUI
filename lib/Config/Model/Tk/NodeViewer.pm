@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-28 13:31:04 +0100 (Fri, 28 Mar 2008) $
-# $Revision: 564 $
+# $Date: 2008-05-15 19:17:47 +0200 (Thu, 15 May 2008) $
+# $Revision: 667 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 564 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 667 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelNodeViewer';
 
@@ -54,7 +54,6 @@ sub Populate {
     $cw->add_header(View => $node) ;
 
     my $inst = $node->instance ;
-    $inst->push_no_value_check('fetch') ;
 
     my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
 
@@ -64,9 +63,9 @@ sub Populate {
 				     -height => 10,
 				   ) ->pack(@fbe1) ;
 
-    my $perm = $cw->parent->parent->parent->parent->get_perm ;
+    my $exp = $cw->parent->parent->parent->parent->get_experience ;
 
-    foreach my $c ($node->get_element_name(for => $perm)) {
+    foreach my $c ($node->get_element_name(for => $exp)) {
 	$rt->insert('end', $c."\n" ) ;
     }
 

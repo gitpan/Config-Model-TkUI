@@ -1,11 +1,11 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
-# $Revision: 573 $
+# $Date: 2008-05-19 13:06:27 +0200 (Mon, 19 May 2008) $
+# $Revision: 674 $
 use warnings FATAL => qw(all);
 
 use ExtUtils::testlib;
-use Test::More tests => 4 ;
+use Test::More tests => 5 ;
 use Tk;
 use Config::Model::TkUI;
 use Config::Model ;
@@ -32,7 +32,7 @@ Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
 
 ok(1,"Compilation done");
 
-my $model = Config::Model -> new ;
+my $model = Config::Model -> new (legacy => 'ignore') ;
 
 my $inst = $model->instance (root_class_name => 'Master',
                              model_file => 't/big_model.pm',
@@ -75,57 +75,89 @@ ok( $root->load( step => $step, permission => 'advanced' ),
 
 #$root->load(step => "tree_macro=XZ", permission => 'advanced') ;
 
+$root->fetch_element('ordered_hash_of_mandatory')->fetch_with_id('foo') ;
+
 # use Tk::ObjScanner; Tk::ObjScanner::scan_object($root) ;
 
 my $toto ;
-my $mw = MainWindow-> new ;
-$mw->withdraw ;
 
-my $cmu = $mw->ConfigModelUI (-root => $root, 
+
+# TBD eval this and skip test in case of failure.
+SKIP: {
+
+    my $mw = eval {MainWindow-> new ; };
+
+    # cannot create Tk window
+    skip "Cannot create Tk window",1 if $@;
+
+    $mw->withdraw ;
+
+    my $cmu = $mw->ConfigModelUI (-root => $root, 
 			     ) ;
 
-my $delay = 200 ;
+    my $delay = 200 ;
+    
+    sub inc_d { $delay += 200 } ;
 
-sub inc_d { $delay += 500 } ;
+    my $tktree= $cmu->Subwidget('tree') ;
+    my $mgr   = $cmu->Subwidget('multi_mgr') ;
 
-my $tktree= $cmu->Subwidget('tree') ;
-my $mgr   = $cmu->Subwidget('multi_mgr') ;
+    my @force_test 
+      = (
+	 sub { $cmu->reload} ,
+	 sub { $cmu->force_element_display($root->grab('std_id:dd DX')) },
+	 sub { $cmu->edit_copy('test1.std_id')},
+	 sub { $cmu->force_element_display($root->grab('hash_a:titi')) },
+	 sub { $cmu->edit_copy('test1.hash_a.titi')},
+	 #sub { $cmu->edit_paste('test1.hash_b')},
+	 #sub { $cmu->force_element_display($root->grab('hash_b:titi')) },
+	) ;
 
-my @test 
-  = (
-     sub { $cmu->create_element_widget('view','test1')},
-     sub { $tktree->open('test1.lista') },
-     sub { $cmu->create_element_widget('edit','test1.std_id');},
-     sub { $cmu->{editor}->add_entry('e')},
-     sub { $tktree->open('test1.std_id') },
-     sub { $cmu->reload} ,
-     sub { $cmu->create_element_widget('view','test1.std_id')},
-     sub { $cmu->create_element_widget('edit','test1.std_id')},
-     sub { $tktree->open('test1.std_id.ab') },
-     sub { $cmu->create_element_widget('view','test1.std_id.ab.Z')},
-     sub { $root->load(step => "std_id:ab Z=Cv") ; $cmu->reload ;},
-     sub { $tktree->open('test1.std_id.ab') },
-     sub { $cmu->create_element_widget('edit','test1.std_id.ab.DX')},
-     sub { $root->load(step => "std_id:ab3") ; $cmu->reload ;} ,
-     sub { $cmu->create_element_widget('view','test1.string_with_def')},
-     sub { $cmu->create_element_widget('edit','test1.string_with_def')},
-     sub { $cmu->create_element_widget('view','test1.a_long_string')},
-     sub { $cmu->create_element_widget('edit','test1.a_long_string')},
-     sub { $cmu->create_element_widget('view','test1.int_v')},
-     sub { $cmu->create_element_widget('edit','test1.int_v')},
-     sub { $cmu->create_element_widget('view','test1.my_plain_check_list')},
-     sub { $cmu->create_element_widget('edit','test1.my_plain_check_list')},
-     sub { $cmu->create_element_widget('view','test1.my_reference')},
-     sub { exit; }
-    );
+    my @test 
+      = (
+	 sub { $cmu->create_element_widget('view','test1')},
+	 sub { $tktree->open('test1.lista') },
+	 sub { $cmu->create_element_widget('edit','test1.std_id');},
+	 sub { $cmu->{editor}->add_entry('e')},
+	 sub { $tktree->open('test1.std_id') },
+	 sub { $cmu->reload} ,
+	 sub { $cmu->create_element_widget('view','test1.std_id')},
+	 sub { $cmu->create_element_widget('edit','test1.std_id')},
+	 sub { $tktree->open('test1.std_id.ab') },
+	 sub { $cmu->create_element_widget('view','test1.std_id.ab.Z')},
+	 sub { $root->load(step => "std_id:ab Z=Cv") ; $cmu->reload ;},
+	 sub { $tktree->open('test1.std_id.ab') },
+	 sub { $cmu->create_element_widget('edit','test1.std_id.ab.DX')},
+	 sub { $root->load(step => "std_id:ab3") ; $cmu->reload ;} ,
+	 sub { $cmu->create_element_widget('view','test1.string_with_def')},
+	 sub { $cmu->create_element_widget('edit','test1.string_with_def')},
+	 sub { $cmu->create_element_widget('view','test1.a_long_string')},
+	 sub { $cmu->create_element_widget('edit','test1.a_long_string')},
+	 sub { $cmu->create_element_widget('view','test1.int_v')},
+	 sub { $cmu->create_element_widget('edit','test1.int_v')},
+	 sub { $cmu->create_element_widget('view','test1.my_plain_check_list')},
+	 sub { $cmu->create_element_widget('edit','test1.my_plain_check_list')},
+	 sub { $cmu->create_element_widget('view','test1.my_ref_check_list')},
+	 sub { $cmu->create_element_widget('edit','test1.my_ref_check_list')},
+	 sub { $cmu->create_element_widget('view','test1.my_reference')},
+	 sub { $cmu->create_element_widget('edit','test1.my_reference')},
+	 sub { exit; }
+	);
 
-unless ($show) {
-    foreach my $t (@test) {
+    foreach my $t (@force_test) {
 	$mw->after($delay, $t);
 	inc_d ;
     }
+
+    unless ($show) {
+	foreach my $t (@test) {
+	    $mw->after($delay, $t);
+	    inc_d ;
+	}
+    }
+
+    ok(1,"window launched") ;
+
+    MainLoop ; # Tk's
+
 }
-
-
-MainLoop ; # Tk's
-

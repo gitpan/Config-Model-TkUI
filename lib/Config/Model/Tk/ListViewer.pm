@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-22 19:10:39 +0100 (Sat, 22 Mar 2008) $
-# $Revision: 558 $
+# $Date: 2008-04-25 13:38:43 +0200 (Fri, 25 Apr 2008) $
+# $Revision: 628 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 558 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 628 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListViewer';
 
@@ -55,9 +55,8 @@ sub Populate {
     $cw->add_header(View => $list) ;
 
     my $inst = $list->instance ;
-    $inst->push_no_value_check('fetch') ;
 
-    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
+    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 2/)->pack(@fxe1) ;
     my $str =  $list->element_name.' '.$list->get_type .' elements' ;
     $elt_frame -> Label(-text => $str) -> pack() ;
 

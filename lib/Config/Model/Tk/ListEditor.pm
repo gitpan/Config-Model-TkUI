@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-24 15:06:55 +0100 (Mon, 24 Mar 2008) $
-# $Revision: 560 $
+# $Date: 2008-05-18 19:14:14 +0200 (Sun, 18 May 2008) $
+# $Revision: 673 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 560 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 673 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -58,16 +58,16 @@ sub Populate {
     $cw->add_header(Edit => $list) ;
 
     my $inst = $list->instance ;
-    $inst->push_no_value_check('fetch') ;
 
     my $elt_button_frame = $cw->Frame->pack(@fbe1) ;
 
-    my $elt_frame = $elt_button_frame->Frame(qw/-relief raised -borderwidth 4/)
+    my $elt_frame = $elt_button_frame->Frame(qw/-relief raised -borderwidth 2/)
                                      ->pack(@fxe1,-side => 'left') ;
     $elt_frame -> Label(-text => $list->element_name.' elements') -> pack() ;
 
     my $tklist = $elt_frame ->Scrolled ( 'Listbox',
 					 -selectmode => 'single',
+					 -scrollbars => 'oe',
 					 -height => 8,
 				       )
                             -> pack(@fbe1, -side => 'left') ;
@@ -106,6 +106,17 @@ sub Populate {
 			     )->pack(-side => 'left', @fxe1);
 	$push_frame -> Entry (-textvariable => \$push_item, 
 			      -width => $entry_width)
+	    -> pack  (-side => 'left') ;
+
+	my $set_all_items = '' ;
+	my $set_all_sub = sub {$cw->set_all_items($set_all_items);} ;
+	my $set_all_frame = $right_frame->Frame->pack( @fxe1);
+	$set_all_frame -> Button(-text => "set all:",
+				 -command => $set_all_sub ,
+				 -anchor => 'e',
+				)->pack(-side => 'left', @fxe1);
+	$set_all_frame -> Entry (-textvariable => \$set_all_items, 
+				 -width => $entry_width)
 	    -> pack  (-side => 'left') ;
 
 	# move up and down don't make much sense for list of nodes...
@@ -195,6 +206,21 @@ sub set_entry {
     $tklist->insert($idx, $data) ;
     $tklist->selectionSet($idx ) ;
     $cw->{list}->fetch_with_id($idx)->store($data) ;
+    $cw->reload_tree ;
+}
+
+sub set_all_items {
+    my $cw =shift;
+    my $data = shift ;
+
+    return unless $data ;
+    my $tklist = $cw->{tklist} ;
+
+    my @list = split /[^\w\-]+/,$data ;
+
+    $tklist->delete(0,'end') ;
+    $tklist->insert(0, @list) ;
+    $cw->{list}->load_data(\@list) ;
     $cw->reload_tree ;
 }
 

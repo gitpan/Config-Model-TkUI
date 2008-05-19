@@ -1,7 +1,7 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
+# $Date: 2008-05-19 13:06:27 +0200 (Mon, 19 May 2008) $
 # $Name: not supported by cvs2svn $
-# $Revision: 537 $
+# $Revision: 674 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -27,11 +27,11 @@ use strict;
 use warnings ;
 use Carp ;
 
-use base qw/ Tk::Frame Config::Model::Tk::AnyViewer/;
+use base qw/ Tk::Frame Config::Model::Tk::CheckListViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 674 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListEditor';
 
@@ -52,7 +52,6 @@ sub Populate {
     delete $args->{-path} ;
 
     my $inst = $leaf->instance ;
-    $inst->push_no_value_check('fetch') ;
 
     $cw->add_header(Edit => $leaf) ;
 
@@ -60,6 +59,7 @@ sub Populate {
 
     my %h = $leaf->get_checked_list_as_hash ;
     my $lb = $ed_frame->Scrolled ( qw/Listbox -selectmode multiple/,
+				   -scrollbars => 'osoe',
 				   -height => 10,
 				 ) ->pack(@fbe1) ;
     my @choice = $leaf->get_choice ;
@@ -70,15 +70,19 @@ sub Populate {
     tie $array_ref, "Tk::Listbox", $lb ;
     # set all element in list box
     $array_ref = $leaf->get_checked_list ; 
-
-    $cw->add_help_frame() ;
-    $cw->add_help(value => \$cw->{help});
+    $cw->{tied} = \$array_ref ;
 
     # mastering perl/Tk page 160
-    my $b_sub = sub { $cw->set_value_help($lb->get($lb->nearest($Tk::event->y)));} ;
-    $lb->bind('<Button-1>',$b_sub);
+    my $b_sub = sub { $cw->set_value_help(@$array_ref);} ;
+    $lb->bind('<<ListboxSelect>>',$b_sub);
 
     my $bframe = $cw->Frame->pack;
+    $bframe -> Button ( -text => 'Clear all',
+			-command => sub { $lb->selectionClear(0,'end') ; },
+		      ) -> pack(-side => 'left') ;
+    $bframe -> Button ( -text => 'Set all',
+			-command => sub { $lb->selectionSet(0,'end') ; },
+		      ) -> pack(-side => 'left') ;
     $bframe -> Button ( -text => 'Reset',
 			-command => sub { $cw->reset_value ; },
 		      ) -> pack(-side => 'left') ;
@@ -86,7 +90,14 @@ sub Populate {
 			-command => sub { $cw->store ( @$array_ref )},
 		      ) -> pack(-side => 'left') ;
 
-    $cw->SUPER::Populate($args) ;
+    $cw->add_help_frame() ;
+    $cw->add_help(class   => $leaf->parent->get_help) ;
+    $cw->add_help(element => $leaf->parent->get_help($leaf->element_name)) ;
+    $cw->{value_help_widget} = $cw->add_help(value => '',1);
+    $b_sub->() ;
+
+    # don't call directly SUPER::Populate as it's CheckListViewer's populate
+    $cw->Tk::Frame::Populate($args) ;
 }
 
 
@@ -109,16 +120,14 @@ sub store {
     }
 }
 
-sub set_value_help {
-    my $cw = shift ;
-    my $v = shift ;
-    $cw->{help} = $cw->{leaf}->get_help($v) if defined $v ;
-}
-
 sub reset_value {
     my $cw = shift ;
 
     my $h_ref = $cw->{leaf}->get_checked_list_as_hash ;
+
+    # reset also the content of the listbox
+    # weird behavior of tied Listbox :-/
+    ${$cw->{tied}} = $cw->{leaf}->get_checked_list ;
 
     # the CheckButtons have stored the reference of the hash *values*
     # so we must preserve them.

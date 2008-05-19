@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-22 18:57:28 +0100 (Sat, 22 Mar 2008) $
-# $Revision: 557 $
+# $Date: 2008-05-19 17:47:53 +0200 (Mon, 19 May 2008) $
+# $Revision: 676 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -31,14 +31,17 @@ my $build = Module::Build->new
    license => 'lgpl',
    dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
-   dist_version  => '0.104' ,
+   dist_version  => '0.105' ,
    requires => {
-		'Config::Model'    => '0.621',
+		'Config::Model'    => '0.623',
 		'Exception::Class' => 0,
 		'Tk'               => 0,
 		'Tk::DirSelect'    => 0,
-		'Log::Log4perl'    => 0,
+		'Log::Log4perl'    => '1.11', # for TRACE log level
 	       },
+   recommends => {
+		  'Tk::ObjScanner' => 0, # for TkUI debug menu
+		 },
    add_to_cleanup => [qw/stderr.log wr_data/] ,
   );
 

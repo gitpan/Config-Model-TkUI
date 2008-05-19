@@ -1,8 +1,8 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
+# $Date: 2008-05-19 13:06:27 +0200 (Mon, 19 May 2008) $
 # $Name: not supported by cvs2svn $
-# $Revision: 573 $
+# $Revision: 674 $
 
 # this file is used by test script
 
@@ -72,6 +72,11 @@
 	       sub_slave => { type => 'node' ,
 			      config_class_name => 'SubSlave',
 			    },
+	       [qw/a_string a_long_string another_string/] 
+                        => { type => 'leaf',
+			     mandatory => 1 ,
+			     value_type => 'string'
+			   },
 	       warp2 => {
 			 type => 'warped_node',
 			 follow  => '! tree_macro',
@@ -116,6 +121,14 @@
 				 ordered => 1 ,
 				 cargo_type => 'leaf',
 				 cargo_args => {value_type => 'uniline'},
+			       },
+	       ordered_hash_of_mandatory => { type => 'hash',
+				 index_type => 'string',
+				 ordered => 1 ,
+				 cargo_type => 'leaf',
+				 cargo_args => {value_type => 'uniline',
+						mandatory => 1,
+					       },
 			       },
 	       ordered_hash_of_nodes => { type => 'hash',
 					  index_type => 'string',
@@ -164,6 +177,10 @@
 			    },
 	       [qw/a_string a_long_string another_string/] 
                         => { type => 'leaf',
+			     value_type => 'string'
+			   },
+	       [qw/a_mandatory_string another_mandatory_string/] 
+                        => { type => 'leaf',
 			     mandatory => 1 ,
 			     value_type => 'string'
 			   },
@@ -182,7 +199,8 @@
 					help => { AA => 'AA help',
 						  AC => 'AC help',
 						  AE => 'AE help',
-						}
+						},
+					description => 'my_plain_check_list nto so helpfull description',
 				      } ,
 	       my_ref_check_list => { type => 'check_list',
 				  refer_to => '- hash_a + ! hash_b',

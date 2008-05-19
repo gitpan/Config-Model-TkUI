@@ -1,6 +1,7 @@
+
 # $Author: ddumont $
-# $Date: 2008-04-03 19:10:35 +0200 (Thu, 03 Apr 2008) $
-# $Revision: 582 $
+# $Date: 2008-05-15 19:17:47 +0200 (Thu, 15 May 2008) $
+# $Revision: 667 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -52,7 +53,7 @@ use Config::Model::Tk::HashEditor ;
 use Config::Model::Tk::NodeViewer ;
 
 
-$VERSION = sprintf "1.%04d", q$Revision: 582 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 667 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -90,11 +91,13 @@ sub Populate {
 	  or croak "Missing $parm arg\n";
     }
 
-    foreach my $parm (qw/-store_sub/) {
+    foreach my $parm (qw/-store_sub -quit -experience/) {
 	my $attr = $parm ;
 	$attr =~ s/^-//;
 	$cw->{$attr} = delete $args->{$parm} ;
     }
+
+    my $extra_menu = delete $args->{'-extra-menu'} || [] ;
 
     # check unknown parameters
     croak "Unknown parameter ",join(' ',keys %$args) if %$args;
@@ -109,28 +112,43 @@ sub Populate {
     require Tk::Menubutton ;
     my $menubar = $cw->Menu ;
     $cw->configure(-menu => $menubar ) ;
+    $cw->{my_menu} = $menubar ;
 
     my $file_items = [[ qw/command reload -command/, sub{ $cw->reload }],
 		      [ qw/command check  -command/, sub{ $cw->check(1)}],
 		      [ qw/command save   -command/, sub{ $cw->save }],
 		      [ command => 'save in dir ...',
                         -command => sub{ $cw->save_in_dir ;} ],
+		      @$extra_menu ,
+		      [ command => 'debug ...',
+                        -command => sub{ require Tk::ObjScanner; 
+					 Tk::ObjScanner::scan_object($cw->{root});}],
 		      [ qw/command quit   -command/, sub{ $cw->quit }],
 		     ] ;
     $menubar->cascade( -label => 'File', -menuitems => $file_items ) ; 
 
     $cw->add_help_menu($menubar) ;
 
-    my $perm_ref = $cw->{scanner}->get_permission_ref ;
-    $cw->{perm_ref} = $perm_ref ;
-    my $perm_items = [
-		      map {['radiobutton',$_,'-variable', $perm_ref,
+    my $edit_items = [
+		      # [ qw/command cut   -command/, sub{ $cw->edit_cut }],
+		      [ qw/command copy  -command/, sub{ $cw->edit_copy }],
+		      [ qw/command paste -command/, sub{ $cw->edit_paste }],
+		     ];
+    $menubar->cascade( -label => 'Edit', -menuitems => $edit_items ) ; 
+
+    my $exp_ref = $cw->{scanner}->get_experience_ref ;
+    $cw->{exp_ref} = $exp_ref ;
+    $$exp_ref = $cw->{experience} ;
+
+    my $exp_items = [
+		      map {['radiobutton',$_,'-variable', $exp_ref,
 			    -command => sub{$cw->reload ;} 
 			   ] }
-		          qw/master advanced intermediate/
+		          qw/master advanced beginner/
 		     ] ;
-    my $opt_items = [[qw/cascade permission -menuitems/, $perm_items ]] ;
+    my $opt_items = [[qw/cascade experience -menuitems/, $exp_items ]] ;
     $menubar->cascade( -label => 'Options', -menuitems => $opt_items ) ; 
+
 
     # create frame for location entry 
     my $loc_frame = $cw -> Frame (-relief => 'sunken', -borderwidth => 1)
@@ -148,7 +166,6 @@ sub Populate {
       -> Scrolled ( qw/Tree/,
 		    -columns => 4,
 		    -header  => 1,
-		    -selectmode => 'single',
 		    -browsecmd => sub{$cw->on_browse(@_) ;},
 		    -command   => sub{$cw->on_select(@_) ;},
 		    -opencmd   => sub{$cw->open_item(@_) ;},
@@ -185,22 +202,25 @@ sub Populate {
 		     $cw->on_select($item)} ;
     $tree->bind('<Button-3>', $b3_sub) ;
 
+    $cw->SUPER::Populate($args) ;
+
     $cw->ConfigSpecs
       (
        #-background => ['DESCENDANTS', 'background', 'Background', $background],
        #-selectbackground => [$hlist, 'selectBackground', 'SelectBackground', 
        #                      $selectbackground],
-       -width  => [$tree, undef, undef, 80],
-       -height => [$tree, undef, undef, 30],
+       -width  => [$tree, undef, undef, 60],
+       -height => [$tree, undef, undef, 20],
+       -selectmode => [ $tree, 'selectMode' ,'SelectMode', 'single' ], #single',
        #-oldcursor => [$hlist, undef, undef, undef],
        DEFAULT => [$tree]
       ) ;
 
     $cw->Advertise(tree => $tree,
+		   menubar => $menubar,
 		   ed_frame => $cw->{e_frame} ,
 		  );
 
-    $cw->SUPER::Populate($args) ;
 }
 
 my $help_text = << 'EOF' ;
@@ -217,17 +237,20 @@ When clicking on store, the new data is stored in the tree represented
 on the left side of TkUI. The new data will be stored in the
 configuration file only when "File->save" menu is invoked.
 
+Copy'n'paste
+
+You copy and paste content from one part of the tree to
+another. Beware, there's no "undo" operation.
+
 EOF
 
 my $todo_text = << 'EOF' ;
 - add wizard
 - add better navigation
 - add tabular view ?
-- decide what to do with the 'Try ??' button
 - improve look and feel
 - add search element or search value
-- improve look and feel
-- expand the tree at once
+- expand the whole tree at once
 - add plug-in mechanism so that dedicated widget
   can be used for some config Class (Could be handy for 
   Xorg::ServerLayout)
@@ -297,12 +320,50 @@ sub check {
     my $show = shift || 0 ;
 
     # first check for errors, will die on errors
-    print $cw->{root}->dump_tree(auto_vivify => 1) ;
+    eval { $cw->{root}->dump_tree(auto_vivify => 1, full_dump => 1) } ;
 
-    if ($show) {
+    if ($@) {
+	$cw->handle_error($@) ;
+    } 
+    elsif ($show) {
 	$cw->Dialog(-title => 'Check',
 		    -text => "No errors found"
 		   ) -> Show ;
+    }
+}
+
+sub handle_error {
+    my $cw = shift;
+    my $e_obj = shift ;
+    my $mode = shift || '' ;
+
+    my @buttons = qw/ok/ ;
+
+    my $conf_obj = $e_obj->object ;
+    push @buttons, 'edit' if defined $conf_obj ;
+
+    push @buttons, 'trace' unless $mode eq 'trace' ;
+
+    my $d = $cw->DialogBox(-title => 'Error',
+			   -buttons => \@buttons,
+			  ) ;
+
+    if ($mode eq 'trace') {
+	my $t = $d->add('ROText') -> pack;
+	$t->insert(end => $e_obj->trace->as_string);
+    }
+    else {
+	$d->add('Label',
+		-text => $e_obj-> as_string ) -> pack ;
+    }
+
+    my $answer = $d -> Show ;
+
+    if ($answer eq 'trace') {
+	$cw->handle_error($e_obj,$answer) ;
+    }
+    elsif ($answer eq 'edit') {
+	$cw->force_element_display($conf_obj) ;
     }
 }
 
@@ -325,25 +386,42 @@ sub save {
     $cw->{modified_data} = 0 ;
 }
 
-sub quit {
+sub save_if_yes {
     my $cw =shift ;
+    my $text = shift || "Save data ?" ;
 
     if ($cw->{modified_data}) {
 	my $answer = $cw->Dialog(-title => "quit",
-				 -text  => "Save data ?",
+				 -text  => $text,
 				 -buttons => [ qw/yes no/],
 				 -default_button => 'yes',
 				)->Show ;
 	$cw->save if $answer eq 'yes';
     }
-    # destroy main window to exit Tk Mainloop;
-    $cw->parent->destroy ;
+}
+
+sub quit {
+    my $cw = shift ;
+
+    $cw->save_if_yes ;
+
+    if (defined $cw->{quit} and $cw->{quit} eq 'soft') {
+	$cw->destroy ;
+    }
+    else {
+	# destroy main window to exit Tk Mainloop;
+	$cw->parent->destroy ;
+    }
 }
 
 sub reload {
     my $cw =shift ;
     my $is_modif = shift || 0;
-    $logger->debug("reloading tk tree") ;
+    my $force_display_obj = shift ;
+
+    $logger->trace("reloading tk tree".
+		   (defined $force_display_obj ? " (forcedisplay)" : '' )
+		  ) ;
 
     my $tree = $cw->{tktree} ;
     $cw->{modified_data} = 1 if $is_modif ;
@@ -364,30 +442,43 @@ sub reload {
 	$tree->open($instance_name) ;
     }
 
-    $sub->(0) ; # the parameter indicates that we are not opening the root
+    # the first parameter indicates that we are opening the root
+    $sub->(1,$force_display_obj) ; 
 }
-
 
 # call-back when Tree element is selected
 sub on_browse {
+    my ($cw,$path) = @_ ;
+    $cw->update_loc_bar($path) ;
+    $cw->create_element_widget('view') ;
+}
+
+sub update_loc_bar {
     my ($cw,$path) = @_ ;
     #$cw->{path}=$path ;
     my $datar = $cw->{tktree}->infoData($path) ;
     my $obj = $datar->[1] ;
     $cw->{location} = $obj->location;
-    $cw->create_element_widget('view') ;
 }
 
 sub on_select {
     my ($cw,$path) = @_ ;
-    $cw->on_browse($path) ;
+    $cw->update_loc_bar($path) ;
     $cw->create_element_widget('edit') ;
 }
 
 
-# replace dot in str by ___
+# replace dot in str by _|_
 sub to_path   { my $str  = shift ; $str  =~ s/\./_|_/g; return $str ;}
 sub from_path { my $path = shift ; $path =~ s/_|_/./g ; return $path; }
+
+sub force_element_display {
+    my $cw   = shift ;
+    my $elt_obj = shift ;
+
+    $logger->trace( "force display of ".$elt_obj->location );
+    $cw->reload(0, $elt_obj) ;
+}
 
 sub prune {
     my $cw = shift ;
@@ -420,12 +511,15 @@ my %elt_mode = ( leaf => 'none',
 
 sub disp_obj_elt {
     my ($scanner, $data_ref,$node,@element_list) = @_ ;
-    my ($path,$cw,$opening) = @$data_ref ;
+    my ($path,$cw,$opening,$fdp_obj) = @$data_ref ;
     my $tkt = $cw->{tktree} ;
     my $mode = $tkt -> getmode($path) ;
-    $logger->trace( "disp_obj_elt path $path mode $mode (@element_list)" );
+    $logger->trace("disp_obj_elt path $path mode $mode opening $opening "
+		   ."(@element_list)" );
 
     $cw->prune($path,@element_list) ;
+
+    my $node_loc = $node->location ;
 
     my $prevpath = '' ;
     foreach my $elt (@element_list) { 
@@ -441,27 +535,30 @@ sub disp_obj_elt {
 	# happen if a non-weakened reference is kept in Tk Tree.
 	weaken( $data[1] );
 
-	unless ($tkt->infoExists($newpath)) {
-	    my @opt = $prevpath ? (-after => $prevpath) : (-at => 0 ) ;
-	    my $elt_type = $node->element_type($elt) ;
-	    my $newmode = $elt_mode{$elt_type};
-	    $logger->trace( "disp_obj_elt add $newpath mode $newmode type $elt_type" );
-	    $tkt->add($newpath, -data => \@data, @opt) ;
-	    $tkt->itemCreate($newpath,0, -text => $elt) ;
-	    $tkt -> setmode($newpath => $newmode) ;
-	    # hide new entry if node is not yet opened
-	    $tkt->hide(-entry => $newpath) if $mode eq 'open' ;
+	my $elt_type = $node->element_type($elt) ;
+	my $eltmode = $elt_mode{$elt_type};
+	if ($tkt->infoExists($newpath)) {
+	    $eltmode = $tkt->getmode($newpath); # will reuse mode below
 	}
-	# counterintuitive but right: scan will be done when the entry
-	# is opened
-	$scan_sub->(0) if ($opening or $mode ne 'open') ; 
+	else {
+	    my @opt = $prevpath ? (-after => $prevpath) : (-at => 0 ) ;
+	    $logger->trace( "disp_obj_elt add $newpath mode $eltmode type $elt_type" );
+	    $tkt -> add($newpath, -data => \@data, @opt) ;
+	    $tkt -> itemCreate($newpath,0, -text => $elt) ;
+	    $tkt -> setmode($newpath => $eltmode) ;
+	}
+
+	my $elt_loc = $node_loc ? $node_loc.' '.$elt : $elt ;
+
+	$cw->setmode('node',$newpath,$eltmode,$elt_loc,$fdp_obj,$opening,$scan_sub) ;
+
 	$prevpath = $newpath ;
     } ;
 }
 
 sub disp_hash {
     my ($scanner, $data_ref,$node,$element_name,@idx) = @_ ;
-    my ($path,$cw,$opening) = @$data_ref ;
+    my ($path,$cw,$opening,$fdp_obj) = @$data_ref ;
     my $tkt = $cw->{tktree} ;
     my $mode = $tkt -> getmode($path) ;
     $logger->trace( "disp_hash    path is $path  mode $mode (@idx)" );
@@ -471,6 +568,8 @@ sub disp_hash {
     my $elt = $node -> fetch_element($element_name) ;
     my $elt_type = $elt->get_cargo_type();
 
+    my $node_loc = $node->location ;
+
     my $prevpath = '' ;
     my $idx_nb = 0 ; # used to keep track of tktree item order
     foreach my $idx (@idx) {
@@ -479,17 +578,14 @@ sub disp_hash {
 	    $scanner->scan_hash([$newpath,$cw,@_],$node, $element_name,$idx);
 	};
 
-	my $newmode = $elt_mode{$elt_type};
+	my $eltmode = $elt_mode{$elt_type};
 
 	if ($tkt->infoExists($newpath) ) {
 	    my $previous_data = $tkt->info(data => $newpath);
 	    my $previous_idx_nb = $previous_data->[2] ;
+	    $eltmode = $tkt->getmode($newpath); # will reuse mode below
 	    if ($idx_nb != $previous_idx_nb) {
-		$newmode = $tkt->getmode($newpath); # will reuse mode below
-		print( "disp_hash delete $newpath mode $newmode (got idx "
-		       .$previous_idx_nb 
-		       ." expected $idx_nb)\n" );
-		$logger->trace( "disp_hash delete $newpath mode $newmode (got "
+		$logger->trace( "disp_hash delete $newpath mode $eltmode (got "
 				.$previous_idx_nb
 				." expected $idx_nb)" );
 		# wrong order, delete the entry
@@ -499,42 +595,88 @@ sub disp_hash {
 
 	if (not $tkt->infoExists($newpath)) {
 	    my @opt = $prevpath ? (-after => $prevpath) : (-at => 0 ) ;
-	    $logger->trace( "disp_hash add $newpath mode $newmode cargo_type $elt_type" );
+	    $logger->trace( "disp_hash add $newpath mode $eltmode cargo_type $elt_type" );
 	    my @data = ( $scan_sub, $elt->fetch_with_id($idx), $idx_nb );
 	    weaken($data[1]) ;
 	    $tkt->add($newpath, -data => \@data, @opt) ;
 	    $tkt->itemCreate($newpath,0, -text => $idx ) ;
-	    $tkt -> setmode($newpath => $newmode) ;
-	    # hide new entry if hash is not yet opened
-	    $tkt->hide(-entry => $newpath) if $mode eq 'open' ;
-	    #my $curmode = $tkt->getmode($path);
+	    $tkt -> setmode($newpath => $eltmode) ;
 	}
 
-	my $idx_mode = $tkt->getmode($newpath) ;
-	$logger->trace( "disp_hash   sub path $newpath is mode $idx_mode" );
-	$scan_sub->(0) if ($opening or $idx_mode ne 'open') ;
+	my $elt_loc = $node_loc ;
+	$elt_loc .=' ' if $elt_loc;
+	$elt_loc .= $element_name.':'.($idx =~ / / ? '"'.$idx.'"' : $idx);
+
+	# hide new entry if hash is not yet opened
+	$cw->setmode('hash',$newpath,$eltmode,$elt_loc,$fdp_obj,$opening,$scan_sub) ;
 
 	$prevpath = $newpath ;
 	$idx_nb++ ;
     } ;
 }
 
+sub setmode {
+    my ($cw,$type,$newpath,$eltmode,$elt_loc,$fdp_obj,$opening,$scan_sub) = @_ ;
+    my $tkt = $cw->{tktree} ;
+
+    my $fdp = defined $fdp_obj ? $fdp_obj->location : '';
+
+    my $force_open  = ($fdp and index($fdp,$elt_loc) == 0) ? 1 : 0 ; 
+    my $force_match = ($fdp and $fdp eq $elt_loc )         ? 1 : 0;
+
+    $logger->trace("$type: elt_loc '$elt_loc', opening $opening "
+		   ."eltmode $eltmode force_open $force_open "
+		   . ($fdp ? "on $fdp" : '' ) 
+		  ) ;
+
+    if ($eltmode ne 'open' or $force_open or $opening ) {
+	$tkt->show( -entry => $newpath);
+	# counter-intuitive: want to display [-] if force opening and not leaf item
+	$tkt -> setmode($newpath => 'close') if($force_open and $eltmode ne 'none');
+    }
+    else {
+	$tkt->close($newpath) ;
+    }
+
+    # counterintuitive but right: scan will be done when the entry
+    # is opened. mode can be open, close, none
+    $scan_sub->($force_open,$fdp_obj) if ( ($eltmode ne 'open') or $force_open) ; 
+
+    if ($force_match) {
+	$tkt->see($newpath);
+	$tkt->selectionSet($newpath) ;
+	$cw->update_loc_bar($newpath) ;
+	$cw->create_element_widget('edit',$newpath) ;
+    }
+}
+
+sub trim_value {
+    my $cw = shift ;
+    my $value = shift ;
+
+    return undef unless defined $value ;
+
+    $value =~ s/\n/ /g;
+    $value = substr($value,0,15) . '...' if length($value) > 15;
+    return $value;
+}
+
 sub disp_check_list {
     my ($scanner, $data_ref,$node,$element_name,$index, $leaf_object) =@_;
-    my ($path,$cw,$opening) = @$data_ref ;
+    my ($path,$cw,$opening,$fdp_obj) = @$data_ref ;
     $logger->trace( "disp_check_list    path is $path" );
 
     my $value = $leaf_object->fetch ;
 
-    $cw->{tktree}->itemCreate($path,2,-text => $value) ;
+    $cw->{tktree}->itemCreate($path,2,-text => $cw->trim_value($value)) ;
 
     my $std_v = $leaf_object->fetch('standard') ;
-    $cw->{tktree}->itemCreate($path,3, -text => $std_v) ;
+    $cw->{tktree}->itemCreate($path,3, -text => $cw->trim_value($std_v)) ;
 }
 
 sub disp_leaf {
     my ($scanner, $data_ref,$node,$element_name,$index, $leaf_object) =@_;
-    my ($path,$cw,$opening) = @$data_ref ;
+    my ($path,$cw,$opening,$fdp_obj) = @$data_ref ;
     $logger->trace( "disp_leaf    path is $path" );
 
     my $std_v = $leaf_object->fetch('standard') ;
@@ -559,22 +701,14 @@ sub disp_leaf {
 	$tkt->itemDelete($path,1) if $tkt->itemExists($path,1) ;
     }
 
-    if (defined $value) {
-	$value =~ s/\n/ /g;
-
-	if (length($value) > 15  ) {
-	    $value = substr($value,0,15) . '...' ;
-	}
-    }
-
-    $tkt->itemCreate($path,2, -text => $value) ;
+    $tkt->itemCreate($path,2, -text => $cw->trim_value($value)) ;
 
     $tkt->itemCreate($path,3, -text => $std_v) ;
 }
 
 sub disp_node {
     my ($scanner, $data_ref,$node,$element_name,$key, $contained_node) = @_;
-    my ($path,$cw,$opening) = @$data_ref ;
+    my ($path,$cw,$opening,$fdp_obj) = @$data_ref ;
     $logger->trace( "disp_node    path is $path" );
     my $curmode = $cw->{tktree}->getmode($path);
     $cw->{tktree}->setmode($path,'open') if $curmode eq 'none';
@@ -592,7 +726,7 @@ sub setup_scanner {
       (
 
        fallback => 'node',
-       permission => 'master', #'intermediate', 
+       experience => 'master', #'beginner', 
 
        # node callback
        node_content_cb       => \&disp_obj_elt ,
@@ -678,8 +812,79 @@ sub create_element_widget {
 }
 
 sub get_perm {
+    carp "get_perm is deprecated";
+    goto &get_experience ;
+}
+
+sub get_experience {
     my $cw = shift ;
-    return $ {$cw->{perm_ref}} ;
+    return $ {$cw->{exp_ref}} ;
+}
+
+sub edit_copy {
+    my $cw = shift ;
+    my $tkt = $cw->{tktree} ;
+
+    my @selected = @_ ? @_ : $tkt -> info('selection');
+
+    print "edit_copy @selected\n";
+    my @res ;
+
+    foreach my $selection (@selected) {
+	my $data_ref = $tkt->infoData($selection);
+
+	my $cfg_elt = $data_ref->[1] ;
+	print "edit_copy ",$cfg_elt->location, " type ", $cfg_elt->get_type,"\n";
+	push  @res, [ $cfg_elt->element_name,
+		      $cfg_elt->index_value ,
+		      $cfg_elt->composite_name,
+		      $cfg_elt->dump_as_data()] ;
+    }
+
+    $cw->{cut_buffer} = \@res ;
+
+    #use Data::Dumper; print "cut_buffer: ", Dumper( \@res ) ,"\n";
+
+    return \@res ; # for tests
+}
+
+sub edit_paste {
+    my $cw = shift ;
+    my $tkt = $cw->{tktree} ;
+
+    my @selected = @_ ? @_ : $tkt -> info('selection');
+
+    print "edit_paste in @selected\n";
+    my @res ;
+
+    my $selection = $selected[0];
+
+    my $data_ref = $tkt->infoData($selection);
+
+    my $cfg_elt = $data_ref->[1] ;
+    print "edit_paste ",$cfg_elt->location, " type ", $cfg_elt->get_type,"\n";
+    my $type = $cfg_elt->get_type ;
+    my $t_name = $cfg_elt->element_name ;
+    my $cut_buf = $cw->{cut_buffer} || [] ;
+
+    foreach my $data (@$cut_buf) {
+	my ($name,$index,$composite,$dump) = @$data;
+	print "from '$composite'\n";
+	if ($name eq $t_name) {
+	   $cfg_elt->load_data($dump) ;
+	}
+	elsif (($type eq 'hash' or $type eq 'list') and defined $index) {
+	    $cfg_elt->fetch_with_id($index)->load_data($dump) ;
+	}
+	elsif ($type eq 'hash' or $type eq 'list' or $type eq 'leaf') {
+	    $cfg_elt->load_data($dump) ;
+	}
+	else {
+	    $cfg_elt->grab($composite)->load_data($dump) ;
+	}
+    }
+
+    $cw->reload(1) if @$cut_buf;
 }
 
 1;
@@ -746,7 +951,7 @@ configuration file only when C<File->save> menu is invoked.
 
 =head2 TODO
 
-Document widget options. (-root_model and -store_sub)
+Document widget options. (-root_model and -store_sub, -quit)
 
 =head1 AUTHOR
 

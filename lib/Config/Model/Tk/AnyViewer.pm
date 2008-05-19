@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-28 13:31:04 +0100 (Fri, 28 Mar 2008) $
-# $Revision: 564 $
+# $Date: 2008-05-18 19:14:14 +0200 (Sun, 18 May 2008) $
+# $Revision: 673 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,10 +32,13 @@ use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 564 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 673 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fb   = qw/-fill both          / ;
+my @fx   = qw/-fill x             / ;
+my @e1   = qw/           -expand 1/ ;
 
 my %img ;
 *icon_path = *Config::Model::TkUI::icon_path ;
@@ -58,64 +61,88 @@ sub add_header {
 
     my $label = "$type: Class $class";
     $label .= "- Element $elt_name" if defined $parent ;
-    my $f = $cw -> Frame -> pack (@fxe1);
+    my $f = $cw -> Frame -> pack (@fx);
 
-    $f -> Label ( -text => $label, -anchor => 'w' )
-       -> pack  (-side => 'left', @fxe1);
-
-    $f -> Label (-image => $img{lc($type)} , -anchor => 'e') 
+    $f -> Label (-image => $img{lc($type)} , -anchor => 'w') 
       -> pack (-side => 'left');
+
+    $f -> Label ( -text => $label, -anchor => 'e' )
+       -> pack  (-side => 'left', @fx);
 }
+
+my @top_frame_args = qw/-relief raised -borderwidth 4/ ;
+my @low_frame_args = qw/-relief sunken -borderwidth 1/ ;
+my $padx = 20 ;
+my $text_font = [qw/-family Arial -weight normal/] ;
 
 sub add_info_frame {
     my $cw = shift;
     my @items = @_;
 
-    my $frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
-    $frame -> Label(-text => 'Info', -anchor => 'w' ) ->pack() ;
+    my $frame = $cw->Frame()->pack(@fx) ;
+    $frame -> Label(-text => 'Info', -anchor => 'w' ) ->pack(qw/-fill x/) ;
 
-    my $i_frame = $frame->Frame(qw/-relief sunken -borderwidth 1/)->pack(@fxe1) ;
-    map { $i_frame -> Label(-text => $_, -anchor => 'w' ) ->pack(@fxe1) } @items;
+    my $i_frame = $frame->Frame(
+				-padx => $padx 
+			       )->pack(@fx) ;
+    map { $i_frame -> Label(-text => $_, 
+			    -anchor => 'w',  
+			    -font => $text_font ,
+			   ) ->pack(@fx)  ;
+	} @items;
 }
 
 
 sub add_help_frame {
     my $cw = shift ;
 
-    my $htop_frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
-    $htop_frame -> Label(-text => 'Help', -anchor => 'w' ) ->pack() ;
+    # FIXME: remove this method
 
-    $cw->{help_f} = $htop_frame->Frame(qw/-relief sunken -borderwidth 1/)->pack(@fxe1) ;
+    #my $htop_frame = $cw->Frame()->pack(@fb) ;
+    #$htop_frame -> Label(-text => 'Help', -anchor => 'w' ) ->pack(@f) ;
+
+    #$cw->{help_f} = $htop_frame#->Frame()->pack(@fb) ;
 }
 
+# returns the help widget (Label or ROText)
 sub add_help {
     my $cw = shift ;
     my $type = shift ;
-    my $help = shift ;
+    my $help = shift || '' ;
+    my $force_text_widget = shift || 0;
 
-    my $help_frame = $cw->{help_f}->Frame()->pack(@fxe1);
+    return undef unless $force_text_widget or $help;
 
-    $help_frame->Label(-text => "on $type: ")->pack(-side => 'left');
-    my @text = ref $help ? ( -textvariable => $help)
-             :             ( -text => $help ) ;
+    my $help_frame = $cw-> Frame()->pack(@fbe1);
 
-    chomp $help if defined $help ;
-    if (    defined $help and not ref $help 
-	and ($help =~ /\n/ or length($help) > 70)) {
-	$help_frame->Scrolled('ROText',
-			      -scrollbars => 'w',
-			      -wrap => 'word',
-			      -height => 4,
-			     )
-	  ->pack( -fill => 'x')
-	    ->insert('end',$help) ;
+    $help_frame ->Label(
+			 -text => "Help on $type: ", 
+			) ->pack(-anchor => 'w');
+
+    my $widget ;
+    chomp $help ;
+    if (  $force_text_widget or $help =~ /\n/ or length($help) > 50) {
+	$widget = $help_frame->Scrolled('ROText',
+					-scrollbars => 'ow',
+					-wrap => 'word',
+					-font => $text_font ,
+					-relief => 'ridge',
+					-height => 4,
+				       );
+
+	$widget ->pack( @fbe1 ) ->insert('end',$help) ;
     }
     else {
-	$help_frame->Label( @text,
-			    -justify => 'left',
-			    -anchor => 'w')
-	  ->pack( -fill => 'x');
+	$widget = $help_frame->Label( -text => $help,
+				      -justify => 'left',
+				      -font => $text_font ,
+				      -anchor => 'w',
+				      -padx => $padx ,
+				    )
+	    ->pack( -fill => 'x');
     }
+
+    return $widget ;
 }
 
 sub add_editor_button {

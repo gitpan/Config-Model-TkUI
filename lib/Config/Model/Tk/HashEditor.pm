@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
-# $Revision: 573 $
+# $Date: 2008-05-09 17:48:46 +0200 (Fri, 09 May 2008) $
+# $Revision: 656 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -33,12 +33,13 @@ use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 use Tk::Photo ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 573 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 656 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelHashEditor';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill x    / ;
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
 my $entry_width = 20 ;
@@ -70,19 +71,20 @@ sub Populate {
     $cw->add_header(Edit => $hash) ;
 
     my $inst = $hash->instance ;
-    $inst->push_no_value_check('fetch') ;
 
     my $elt_button_frame = $cw->Frame->pack(@fbe1) ;
 
-    my $elt_frame = $elt_button_frame->Frame(qw/-relief raised -borderwidth 4/)
-                                     ->pack(@fxe1,-side => 'left') ;
+    my $elt_frame = $elt_button_frame->Frame(qw/-relief raised -borderwidth 2/)
+                                     ->pack(@fbe1,-side => 'left') ;
     $elt_frame -> Label(-text => $hash->element_name.' elements') -> pack() ;
 
     my $tklist = $elt_frame ->Scrolled ( 'Listbox',
 					 -selectmode => 'single',
-					 -height => 8,
+					 -scrollbars => 'oe',
+					 -height => 6,
 				       )
                             -> pack(@fbe1, -side => 'left') ;
+
     $tklist->insert( end => $hash->get_all_indexes) ;
 
     my $right_frame = $elt_button_frame->Frame->pack(@fxe1, -side => 'left');
@@ -99,7 +101,7 @@ sub Populate {
     $add_frame -> Button(-text => "Add item $add_str:",
 			 -command => sub {$cw->add_entry($add_item);},
 			 -anchor => 'e',
-			)->pack(-side => 'left', @fxe1);
+			)->pack(-side => 'left', @fx);
     $add_frame -> Entry (-textvariable => \$add_item, -width => $entry_width)
                -> pack  (-side => 'left') ;
 
@@ -109,7 +111,7 @@ sub Populate {
 			-command => sub {$cw->copy_selected_in($cp_item);},
 			-anchor => 'e',
 		       )
-              -> pack(-side => 'left', @fxe1);
+              -> pack(-side => 'left', @fx);
     $cp_frame -> Entry (-textvariable => \$cp_item, -width => $entry_width)
               -> pack  (-side => 'left') ;
 
@@ -182,6 +184,8 @@ sub add_entry {
 
     $logger->debug( "new hash idx: ". join(',',$hash->get_all_indexes));
 
+    $tklist -> selectionClear(0,'end') ;
+
     # ensure correct order for ordered hash
     my @selected = $tklist->curselection() ;
 
@@ -190,11 +194,16 @@ sub add_entry {
 	$logger->debug("add_entry on ordered hash: swap $idx and $add");
 	$hash->move_after($add, $idx) ;
 	$logger->debug( "new hash idx: ". join(',',$hash->get_all_indexes));
-	$tklist->insert($selected[0]+1 || 0,$add) ;
+	my $new_idx = $selected[0] + 1 ;
+	$tklist -> insert($new_idx,$add) ;
+	$tklist -> selectionSet($new_idx) ;
+	$tklist -> see($new_idx) ;
     }
     elsif ($hash->ordered) {
 	# without selection on ordered hash, items are simply pushed
-	$tklist->insert('end',$add) ;
+	$tklist -> insert('end',$add) ;
+	$tklist -> selectionSet('end') ;
+	$tklist -> see('end') ;
     }
     else {
 	$cw->add_and_sort_item($add) ;
@@ -212,15 +221,24 @@ sub add_and_sort_item {
     my $tklist = $cw->{tklist} ;
     my $idx = 0;
     my $added = 0 ;
+
+    $tklist -> selectionClear(0,'end') ;
     foreach ($tklist->get(0,'end')) {
 	if ($add lt $_) {
-	    $tklist->insert($idx,$add);
+	    $tklist -> insert($idx,$add);
+	    $tklist -> selectionSet($idx) ;
+	    $tklist -> see($idx) ;
 	    $added = 1 ;
 	    last;
 	}
 	$idx ++ ;
     }
-    $tklist->insert('end',$add) unless $added; # last entry
+
+    if (not $added) {
+	$tklist -> insert('end',$add); # last entry
+	$tklist -> selectionSet('end') ;
+	$tklist -> see('end') ;
+    }
 }
 
 sub add_item {
@@ -232,19 +250,35 @@ sub add_item {
 
     # add entry in tklist
     if ($hash->ordered) {
-	$tklist->insert('end',$add) ;
-    }
+	$tklist -> selectionClear(0,'end') ;
+	$tklist -> insert('end',$add) ;
+	$tklist -> selectionSet('end') ;
+	$tklist -> see('end') ;    }
     else {
 	# add the item so that items are ordered alphabetically
 	$cw->add_and_sort_item($add) ;
     }
 }
 
+sub get_selection {
+    my $cw =shift;
+    my $what = shift ;
+    my $tklist = $cw->{tklist} ;
+    my @from_idx = $tklist->curselection() ;
+    if (not @from_idx) {
+	$cw->Dialog(-title => "$what selection error",
+		    -text  => " Please select an item to $what",
+		   )
+           ->Show() ;
+    }
+    return @from_idx ;
+}
+
 sub copy_selected_in {
     my $cw =shift;
     my $to_name = shift ;
     my $tklist = $cw->{tklist} ;
-    my @from_idx = $tklist->curselection() ;
+    my @from_idx = $cw->get_selection('copy') or return 0 ;
     my $from_name = $tklist->get(@from_idx);
 
     if ($from_name eq $to_name) {
@@ -272,7 +306,7 @@ sub move_selected_to {
     my $cw =shift;
     my $to_name = shift ;
     my $tklist = $cw->{tklist} ;
-    my @from_idx = $tklist->curselection() ;
+    my @from_idx = $cw->get_selection('move') or return 0 ;
     my $from_name = $tklist->get(@from_idx);
 
     if ($from_name eq $to_name) {
@@ -291,7 +325,15 @@ sub move_selected_to {
     $hash->move($from_name,$to_name) ;
 
     if ($new_idx) {
-	$cw->add_item($to_name) ;
+	if ($hash->ordered) {
+	    $tklist -> selectionClear(0,'end') ;
+	    $tklist -> insert($from_idx[0],$to_name) ;
+	    $tklist -> selectionSet($from_idx[0]) ;
+	}
+	else {
+	    # add the item so that items are ordered alphabetically
+	    $cw->add_and_sort_item($to_name) ;
+	}
     }
 
     $cw->reload_tree ;
@@ -311,6 +353,7 @@ sub move_selected_up {
     my $new_idx = $idx[0] - 1 ;
     $tklist -> insert($new_idx, $name) ;
     $tklist -> selectionSet($new_idx) ;
+    $tklist -> see($new_idx) ;
 
     my $hash = $cw->{hash};
     $hash->move_up($name) ;
@@ -335,6 +378,7 @@ sub move_selected_down {
     my $new_idx = $idx[0] + 1 ;
     $tklist -> insert($new_idx, $name) ;
     $tklist -> selectionSet($new_idx) ;
+    $tklist -> see($new_idx) ;
 
     $hash->move_down($name) ;
     $logger->debug( "move_down new hash idx: ". join(',',$hash->get_all_indexes));

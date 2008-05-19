@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-29 20:16:50 +0100 (Sat, 29 Mar 2008) $
-# $Revision: 573 $
+# $Date: 2008-05-15 14:00:38 +0200 (Thu, 15 May 2008) $
+# $Revision: 664 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,12 +30,13 @@ use Log::Log4perl;
 use base qw/Config::Model::Tk::LeafViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 573 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 664 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill x  / ;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
@@ -64,16 +65,22 @@ sub Populate {
     $cw->{value} = $leaf->fetch || '';
     my $vref = \$cw->{value};
 
-    my $v_frame =  $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
-    $v_frame  -> Label(-text => 'Value') -> pack() ;
-    my $ed_frame = $v_frame->Frame(qw/-relief sunken -borderwidth 1/)
-      ->pack(@fxe1) ;
+    my @pack_args = @fx ;
+    @pack_args = @fbe1 if $vt eq 'string' or $vt eq 'enum' 
+                       or $vt eq 'reference' ;
+
+    my $ed_frame =  $cw->Frame(qw/-relief raised -borderwidth 2/)
+      ->pack(@pack_args) ;
+    $ed_frame  -> Label(-text => 'Value') -> pack() ;
 
     if ($vt eq 'string') {
-	$cw->{e_widget} = $v_frame->Text(-height => 10 )
+	$cw->{e_widget} = $ed_frame->Scrolled ( 'Text',
+						-height => 5 ,
+						-scrollbars => 'ow',
+					      )
                              ->pack(@fbe1);
 	$cw->reset_value ;
-	$cw->add_buttons($v_frame) ;
+	$cw->add_buttons($ed_frame) ;
     }
     elsif ($vt eq 'boolean') {
 	$ed_frame->Checkbutton(-text => $leaf->element_name,
@@ -85,15 +92,16 @@ sub Populate {
     }
     elsif ($vt eq 'uniline' or $vt eq 'integer') {
 	$ed_frame -> Entry(-textvariable => $vref)
-	    -> pack(@fbe1);
+	    -> pack(@fx);
 	$cw->add_buttons($ed_frame) ;
     }
     elsif ($vt eq 'enum' or $vt eq 'reference') {
 	my $lb = $ed_frame->Scrolled ( 'Listbox',
 				       -height => 5,
+				       -scrollbars => 'osow',
 				       #-listvariable => $vref,
 				       #-selectmode => 'single',
-				     ) ->pack(@fxe1) ;
+				     ) ->pack(@fbe1) ;
 	my @choice = $leaf->get_choice ;
 	$lb->insert('end',$leaf->get_choice) ;
 	my $idx = 0;
@@ -102,12 +110,13 @@ sub Populate {
 	$cw->add_buttons($ed_frame) ;
     }
 
+    $inst->pop_no_value_check ;
+
     $cw->add_info() ;
     $cw->add_help_frame() ;
     $cw->add_help(class   => $leaf->parent->get_help) ;
     $cw->add_help(element => $leaf->parent->get_help($leaf->element_name)) ;
-    $cw->{value_help} = '';
-    $cw->add_help(value => \$cw->{value_help});
+    $cw->{value_help_widget} = $cw->add_help(value => '',1);
     $cw->set_value_help ;
 
     $cw->ConfigSpecs(
@@ -140,6 +149,7 @@ sub add_buttons {
 sub try {
     my $cw = shift ;
     my $v = shift ;
+
     if (defined $v) {
 	$cw->{value} = $v ;
     }
@@ -149,6 +159,8 @@ sub try {
 	$v = defined  $e_w ? $e_w->get('1.0','end')
            :                 $cw->{value} ;
     }
+    chomp $v ;
+
     $logger->debug( "try: value $v") ;
     require Tk::Dialog ;
 
@@ -170,6 +182,7 @@ sub try {
 
 sub delete {
     my $cw = shift ;
+
     eval {$cw->{leaf}->store(undef); } ;
 
     if ($@) {
@@ -180,6 +193,7 @@ sub delete {
     }
     else {
 	# trigger redraw of Tk Tree
+	$cw->reset_value ;
 	$cw->parent->parent->parent->parent->reload(1) ;
     }
 }
@@ -188,6 +202,8 @@ sub store {
     my $cw = shift ;
     my $v = $cw->try ;
     return unless defined $v;
+
+    print "Storing '$v'\n";
 
     eval {$cw->{leaf}->store($v); } ;
 
@@ -207,7 +223,12 @@ sub store {
 sub set_value_help {
      my $cw = shift ;
      my $v = $cw->{value} ;
-     $cw->{value_help} = $cw->{leaf}->get_help($v) if defined $v ;
+     if (defined $v) {
+	 my $value_help = $cw->{leaf}->get_help($v);
+	 my $w = $cw->{value_help_widget};
+	 $w->delete('0.0','end');
+	 $w->insert('end',$value_help) if defined $value_help ;
+     }
  }
 
 sub reset_value {
@@ -217,7 +238,7 @@ sub reset_value {
 	$cw->{e_widget}->delete('1.0','end') ;
 	$cw->{e_widget}->insert('end',$cw->{value}) ;
     }
-    $cw->set_value_help ;
+    $cw->set_value_help if defined $cw->{value_help_widget};
 }
 
 1;

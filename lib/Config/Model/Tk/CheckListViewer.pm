@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-03-11 13:41:37 +0100 (Tue, 11 Mar 2008) $
-# $Revision: 537 $
+# $Date: 2008-05-19 13:06:27 +0200 (Mon, 19 May 2008) $
+# $Revision: 674 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -31,7 +31,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::ROText ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 537 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 674 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListViewer';
 
@@ -53,24 +53,29 @@ sub Populate {
       || die "CheckListViewer: no -path, got ",keys %$args;
 
     my $inst = $leaf->instance ;
-    $inst->push_no_value_check('fetch') ;
 
     $cw->add_header(View => $leaf) ;
 
     my $rt = $cw->Scrolled ( 'ROText',
+			     -scrollbars => 'osoe',
 			     -height => 10,
 			   ) ->pack(@fbe1) ;
     $rt->tagConfigure('in',-background => 'black', -foreground => 'white') ;
 
     $cw->add_info() ;
     $cw->add_help_frame() ;
+    $cw->add_help(class   => $leaf->parent->get_help) ;
+    $cw->add_help(element => $leaf->parent->get_help($leaf->element_name)) ;
+    $cw->{value_help_widget} = $cw->add_help(value => '',1);
 
     my %h = $leaf->get_checked_list_as_hash ;
     foreach my $c ($leaf->get_choice) {
 	my $tag = $h{$c} ? 'in' : 'out' ;
 	$rt->insert('end', $c."\n" , $tag) ;
-	$cw->add_help("$c", $leaf->get_help($c)) if $h{$c};
     }
+
+    $cw->set_value_help($leaf->get_checked_list);
+
     $cw->add_editor_button($path) ;
 
     $cw->SUPER::Populate($args) ;
@@ -89,10 +94,17 @@ sub add_value_help {
 }
 
 sub set_value_help {
-    my $cw = shift ;
-    my $v = shift ;
-    $cw->{help} = $cw->{leaf}->get_help($v) if defined $v ;
-}
+     my $cw = shift ;
+     my @set = @_ ;
+
+     my $w = $cw->{value_help_widget};
+     $w->delete('0.0','end');
+
+     foreach my $v (@set) {
+	 my $value_help = $cw->{leaf}->get_help($v);
+	 $w->insert('end',"$v: ".$value_help."\n") if defined $value_help ;
+     }
+ }
 
 sub add_info {
     my $cw = shift ;
