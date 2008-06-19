@@ -1,6 +1,6 @@
 ---
 name: Config-Model-TkUI
-version: 0.105
+version: 0.201
 author:
   - Dominique Dumont (ddumont at cpan dot org)
 abstract: Tk GUI to edit config data through Config::Model
@@ -48,7 +48,7 @@ provides:
     version: 1.0667
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.0667
+    version: 1.0699
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
