@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-05-18 19:14:14 +0200 (Sun, 18 May 2008) $
-# $Revision: 673 $
+# $Date: 2008-07-25 17:16:34 +0200 (Fri, 25 Jul 2008) $
+# $Revision: 734 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 673 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 734 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -119,13 +119,6 @@ sub Populate {
 				 -width => $entry_width)
 	    -> pack  (-side => 'left') ;
 
-	# move up and down don't make much sense for list of nodes...
-	$right_frame->Button(-text => 'Move selected up',
-			     -command => sub { $cw->move_up ;} ,
-			    )-> pack( @fxe1);
-	$right_frame->Button(-text => 'Move selected down',
-			     -command => sub { $cw->move_down ;} ,
-			    )-> pack( @fxe1);
     }
     else {
 	my $disp = $cargo_type ;
@@ -135,6 +128,13 @@ sub Populate {
 			    )-> pack( @fxe1);
     }
 
+
+    $right_frame->Button(-text => 'Move selected up',
+			 -command => sub { $cw->move_up ;} ,
+			)-> pack( @fxe1);
+    $right_frame->Button(-text => 'Move selected down',
+			 -command => sub { $cw->move_down ;} ,
+			)-> pack( @fxe1);
 
     $right_frame->Button(-text => 'Remove selected',
 			 -command => sub { $cw->remove_selection ;} ,

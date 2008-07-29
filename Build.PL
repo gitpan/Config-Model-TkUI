@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-06-19 13:55:33 +0200 (Thu, 19 Jun 2008) $
-# $Revision: 701 $
+# $Date: 2008-07-29 17:45:06 +0200 (Tue, 29 Jul 2008) $
+# $Revision: 739 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -31,7 +31,7 @@ my $build = Module::Build->new
    license => 'lgpl',
    dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
-   dist_version  => '0.201' ,
+   dist_version  => '0.202' ,
    requires => {
 		'Config::Model'    => '0.623',
 		'Exception::Class' => 0,

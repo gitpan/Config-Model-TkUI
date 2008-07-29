@@ -1,6 +1,6 @@
 ---
 name: Config-Model-TkUI
-version: 0.201
+version: 0.202
 author:
   - Dominique Dumont (ddumont at cpan dot org)
 abstract: Tk GUI to edit config data through Config::Model
@@ -39,7 +39,7 @@ provides:
     version: 1.0664
   Config::Model::Tk::ListEditor:
     file: lib/Config/Model/Tk/ListEditor.pm
-    version: 1.0673
+    version: 1.0734
   Config::Model::Tk::ListViewer:
     file: lib/Config/Model/Tk/ListViewer.pm
     version: 1.0628
