@@ -1,8 +1,8 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008-05-19 13:06:27 +0200 (Mon, 19 May 2008) $
+# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
 # $Name: not supported by cvs2svn $
-# $Revision: 674 $
+# $Revision: 775 $
 
 # this file is used by test script
 
@@ -140,6 +140,12 @@
 			  cargo_type => 'node',
 			  config_class_name => 'SlaveZ' ,
 			},
+	       enum_list => { type => 'list',
+			      cargo => { type => 'leaf',
+					 value_type => 'enum',
+					 choice => [qw/A B C/],
+				       }
+			    },
 	       tree_macro => { type => 'leaf',
 			       value_type => 'enum',
 			       choice     => [qw/XY XZ mXY/],
@@ -205,6 +211,13 @@
 	       my_ref_check_list => { type => 'check_list',
 				  refer_to => '- hash_a + ! hash_b',
 				} ,
+	       'ordered_checklist'
+	       => { type => 'check_list',
+		    choice     => ['A' .. 'Z'],
+		    ordered => 1 ,
+		    help => { A => 'A help', E => 'E help' } ,
+		  },
+
 	       my_reference => { type => 'leaf',
 				 value_type => 'reference',
 				 refer_to => '- hash_a + ! hash_b',

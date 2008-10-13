@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-07-25 17:16:34 +0200 (Fri, 25 Jul 2008) $
-# $Revision: 734 $
+# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
+# $Revision: 775 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 734 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 775 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -75,6 +75,7 @@ sub Populate {
     my $cargo_type = $list->cargo_type ;
     my @insert = $cargo_type eq 'leaf' ? $list->fetch_all_values 
                :                         $list->get_all_indexes ;
+    map { $_ = '<undef>' unless defined $_ } @insert ;
     $tklist->insert( end => @insert ) ;
 
     my $right_frame = $elt_button_frame->Frame->pack(@fxe1, -side => 'left');
@@ -84,7 +85,8 @@ sub Populate {
     $cw->add_help(class   => $list->parent->get_help) ;
     $cw->add_help(element => $list->parent->get_help($list->element_name)) ;
 
-    if ($cargo_type eq 'leaf') {
+    my $value_type = $list->get_cargo_info('value_type') ; # may be undef
+    if ($cargo_type eq 'leaf' and $value_type ne 'enum' and $value_type ne 'reference') {
 	my $set_item = '';
 	my $set_sub = sub {$cw->set_entry($set_item); $set_item = '';} ;
 	my $set_frame = $right_frame->Frame->pack( @fxe1);
@@ -123,6 +125,7 @@ sub Populate {
     else {
 	my $disp = $cargo_type ;
 	$disp .= ' ('.$list->config_class_name.')' if $cargo_type eq 'node' ;
+	$disp .= " ($value_type)" if defined $value_type ;
 	$right_frame->Button(-text => "Push new $disp",
 			     -command => sub { $cw->push_entry('') ;} ,
 			    )-> pack( @fxe1);
@@ -161,7 +164,8 @@ sub push_entry {
     $logger->debug("push_entry: $add");
 
     my $cargo_type = $list->cargo_type ;
-    if ($cargo_type eq 'leaf') {
+    my $value_type = $list->get_cargo_info('value_type') ; # may be undef
+    if ($cargo_type eq 'leaf' and $value_type ne 'enum' and $value_type ne 'reference') {
 	return unless $add;
 	eval {$list->push($add) ;};
     }
@@ -185,7 +189,7 @@ sub push_entry {
     my @new_idx = $list->get_all_indexes ;
     $logger->debug("new list idx: ". join(',',@new_idx));
 
-    my $insert = $cargo_type eq 'leaf' ? $add : $#new_idx ;
+    my $insert = $add || $#new_idx ;
     $tklist->insert('end',$insert);
 
     return 1 ;
@@ -236,6 +240,7 @@ sub move_up {
 
     my $from_idx = $from_idx_ref->[0] ;
     return unless $from_idx ;
+    return unless $from_idx > 0 ;
 
     $cw->swap($from_idx , $from_idx - 1) ;
 }
@@ -250,6 +255,7 @@ sub move_down {
     return unless @$from_idx_ref ;
 
     my $from_idx = $from_idx_ref->[0] ;
+    return unless $from_idx < @$from_idx_ref ;
 
     $cw->swap($from_idx , $from_idx + 1) ;
 }
@@ -262,13 +268,20 @@ sub swap {
     my $list = $cw->{list};
     $list->swap($ida , $idb) ;
 
-    my $old = $tklist->get($ida) ;
-    $tklist->delete($ida) ;
+    my $cargo_type = $list->cargo_type ;
 
-    while ($idb > $tklist->size) {
-	$tklist->insert('end','<undef>') ;
+    $tklist->selectionClear($ida ) ;
+
+    if ($cargo_type ne 'node') {
+	my $old = $tklist->get($ida) ;
+	$tklist->delete($ida) ;
+
+	while ($idb > $tklist->size) {
+	    $tklist->insert('end','<undef>') ;
+	}
+	$tklist->insert($idb, $old) ;
     }
-    $tklist->insert($idb, $old) ;
+
     $tklist->selectionSet($idb ) ;
     $cw->reload_tree ;
 }

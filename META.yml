@@ -1,6 +1,6 @@
 ---
 name: Config-Model-TkUI
-version: 0.202
+version: 1.203
 author:
   - Dominique Dumont (ddumont at cpan dot org)
 abstract: Tk GUI to edit config data through Config::Model
@@ -8,7 +8,7 @@ license: lgpl
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
 requires:
-  Config::Model: 0.623
+  Config::Model: 0.629
   Exception::Class: 0
   Log::Log4perl: 1.11
   Tk: 0
@@ -21,7 +21,7 @@ provides:
     version: 1.0673
   Config::Model::Tk::CheckListEditor:
     file: lib/Config/Model/Tk/CheckListEditor.pm
-    version: 1.0674
+    version: 1.0775
   Config::Model::Tk::CheckListViewer:
     file: lib/Config/Model/Tk/CheckListViewer.pm
     version: 1.0674
@@ -39,16 +39,16 @@ provides:
     version: 1.0664
   Config::Model::Tk::ListEditor:
     file: lib/Config/Model/Tk/ListEditor.pm
-    version: 1.0734
+    version: 1.0775
   Config::Model::Tk::ListViewer:
     file: lib/Config/Model/Tk/ListViewer.pm
-    version: 1.0628
+    version: 1.0775
   Config::Model::Tk::NodeViewer:
     file: lib/Config/Model/Tk/NodeViewer.pm
     version: 1.0667
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.0699
+    version: 1.203
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

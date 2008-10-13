@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-04-25 13:38:43 +0200 (Fri, 25 Apr 2008) $
-# $Revision: 628 $
+# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
+# $Revision: 775 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 628 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 775 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListViewer';
 
@@ -67,7 +67,8 @@ sub Populate {
     my @insert = $list->cargo_type eq 'leaf' ? $list->fetch_all_values 
                :                         $list->get_all_indexes ;
     foreach my $c (@insert) {
-	$rt->insert('end', $c."\n" ) ;
+	my $line = defined $c ? $c : '<undef>' ;
+	$rt->insert('end', $line."\n" ) ;
     }
 
     $cw->add_info($cw) ;
@@ -93,6 +94,10 @@ sub add_info {
 
     if ($list->cargo_type eq 'node') {
 	push @items, "cargo class: " . $list->config_class_name ;
+    }
+
+    if ($list->cargo_type eq 'leaf') {
+	push @items, "leaf value type: " . ($list->get_cargo_info('value_type') || '') ;
     }
 
     foreach my $what (qw//) {
