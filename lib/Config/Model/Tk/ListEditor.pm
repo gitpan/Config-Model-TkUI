@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
-# $Revision: 775 $
+# $Date: 2008-12-22 13:19:00 +0100 (Mon, 22 Dec 2008) $
+# $Revision: 815 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 775 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 815 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -294,9 +294,16 @@ sub remove_selection {
     foreach ($tklist->curselection()) {
 	$logger->debug( "remove_selection: removing index $_" );
 	$list   -> remove($_) ;
-	$tklist -> delete($_) ;
 	$cw->reload_tree ;
     }
+
+    # redraw the list content
+    $tklist -> delete(0,'end') ;
+    my $cargo_type = $list->cargo_type ;
+    my @insert = $cargo_type eq 'leaf' ? $list->fetch_all_values 
+               :                         $list->get_all_indexes ;
+    map { $_ = '<undef>' unless defined $_ } @insert ;
+    $tklist->insert( end => @insert ) ;
 }
 
 sub store {

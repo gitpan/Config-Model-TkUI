@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-05-18 19:14:14 +0200 (Sun, 18 May 2008) $
-# $Revision: 673 $
+# $Date: 2008-12-22 14:36:03 +0100 (Mon, 22 Dec 2008) $
+# $Revision: 818 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 673 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 818 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -47,8 +47,8 @@ sub add_header {
     my ($cw,$type,$item) = @_ ;
 
     unless (%img) {
-	$img{edit} = $cw->Photo(-file => $icon_path.'edit-find-replace.gif');
-	$img{view} = $cw->Photo(-file => $icon_path.'system-search.gif');
+	$img{edit} = $cw->Photo(-file => $icon_path.'wizard.png');
+	$img{view} = $cw->Photo(-file => $icon_path.'viewmag.png');
     }
 
     my $idx ;

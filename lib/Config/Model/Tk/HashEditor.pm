@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-05-09 17:48:46 +0200 (Fri, 09 May 2008) $
-# $Revision: 656 $
+# $Date: 2008-11-20 09:13:52 +0100 (Thu, 20 Nov 2008) $
+# $Revision: 805 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -33,7 +33,7 @@ use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 use Tk::Photo ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 656 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 805 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelHashEditor';
 
@@ -64,8 +64,8 @@ sub Populate {
     delete $args->{-path} ;
 
     unless (defined $up_img) {
-	$up_img   = $cw->Photo(-file => $icon_path.'go-up.gif');
-	$down_img = $cw->Photo(-file => $icon_path.'go-down.gif');
+	$up_img   = $cw->Photo(-file => $icon_path.'up.png');
+	$down_img = $cw->Photo(-file => $icon_path.'down.png');
     }
 
     $cw->add_header(Edit => $hash) ;
@@ -184,10 +184,11 @@ sub add_entry {
 
     $logger->debug( "new hash idx: ". join(',',$hash->get_all_indexes));
 
-    $tklist -> selectionClear(0,'end') ;
 
     # ensure correct order for ordered hash
     my @selected = $tklist->curselection() ;
+
+    $tklist -> selectionClear(0,'end') ;
 
     if (@selected and $hash->ordered) {
 	my $idx = $tklist->get($selected[0]);

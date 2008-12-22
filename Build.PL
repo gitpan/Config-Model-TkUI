@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
-# $Revision: 775 $
+# $Date: 2008-12-22 14:36:03 +0100 (Mon, 22 Dec 2008) $
+# $Revision: 818 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -36,6 +36,7 @@ my $build = Module::Build->new
 		'Exception::Class' => 0,
 		'Tk'               => 0,
 		'Tk::DirSelect'    => 0,
+		'Tk::Tree'         => 0,
 		'Log::Log4perl'    => '1.11', # for TRACE log level
 	       },
    recommends => {
@@ -44,5 +45,5 @@ my $build = Module::Build->new
    add_to_cleanup => [qw/stderr.log wr_data/] ,
   );
 
-$build->add_build_element('gif');
+$build->add_build_element('png');
 $build->create_build_script;

@@ -1,3 +1,19 @@
+2008-12-22  Dominique Dumont  <dominique.dumont@hp.com> v1.204
+
+	* *.pm: replaced Tango icons with Crystal icons (LGPL) to comply
+	with Debian DFSG.
+
+2008-11-20  Dominique Dumont  <dominique.dumont@hp.com>
+
+	* lib/Config/Model/Tk/HashEditor.pm (add_entry): Fixed bug that
+	prevented to insert a new item in the middle of an ordered hash
+
+2008-11-16  Domi  <domi@bilbo.maison>
+
+	* lib/Config/Model/Tk/ListEditor.pm (remove_selection): fixed bug
+	that displayed wrong indexes when deleting an element of a list of
+	nodes.
+
 2008-10-13  Dominique Dumont  <dominique.dumont@hp.com> v1.203
 
 	* lib/Config/Model/Tk/CheckListEditor.pm: added Notebook tab to

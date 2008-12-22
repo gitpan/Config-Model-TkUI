@@ -1,7 +1,7 @@
 
 # $Author: ddumont $
-# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
-# $Revision: 775 $
+# $Date: 2008-12-22 14:36:03 +0100 (Mon, 22 Dec 2008) $
+# $Revision: 818 $
 
 #    Copyright (c) 2007,2008 Dominique Dumont.
 #
@@ -34,6 +34,7 @@ use Scalar::Util qw/weaken/;
 use Log::Log4perl;
 
 use Tk::Photo ;
+use Tk::PNG ; # required for Tk::Photo to be able to load pngs
 use Tk::DialogBox ;
 
 require Tk::ErrorDialog;
@@ -53,7 +54,7 @@ use Config::Model::Tk::HashEditor ;
 use Config::Model::Tk::NodeViewer ;
 
 
-$VERSION = '1.203' ;
+$VERSION = '1.204' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -81,10 +82,10 @@ sub Populate {
     my ($cw, $args) = @_;
 
     unless (defined $warn_img) {
-	$warn_img = $cw->Photo(-file => $icon_path.'dialog-warning.gif');
-	$cust_img = $cw->Photo(-file => $icon_path.'go-next.gif');
+	$warn_img = $cw->Photo(-file => $icon_path.'stop.png');
+	$cust_img = $cw->Photo(-file => $icon_path.'next.png');
 	# snatched from openclip-arts-png
-	$tool_img = $cw->Photo(-file => $icon_path.'tools_nicu_buculei_01.gif');
+	$tool_img = $cw->Photo(-file => $icon_path.'tools_nicu_buculei_01.png');
     }
 
     foreach my $parm (qw/-root/) {
@@ -970,6 +971,27 @@ Document widget options. (-root_model and -store_sub, -quit)
 
 Dominique Dumont, (ddumont at cpan dot org)
 
+=head1 LICENSE
+
+    Copyright (c) 2008 Dominique Dumont.
+
+    This file is part of Config-Model.
+
+    Config-Model is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser Public License as
+    published by the Free Software Foundation; either version 2.1 of
+    the License, or (at your option) any later version.
+
+    Config-Model is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser Public License for more details.
+
+    You should have received a copy of the GNU Lesser Public License
+    along with Config-Model; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA
+
 =head1 SEE ALSO
 
 =over
@@ -1002,11 +1024,11 @@ This projects also needs help to improve its user interfaces:
 
 =item *
 
-Look and fell of Perl/Tk interface can be improved
+Look and feel of Perl/Tk interface can be improved
 
 =item *
 
-A nice logo (a penguin with a wrench maybe ) would be welcomed
+A nicer logo (maybe a penguin with a wrench...) would be welcomed
 
 =item *
 

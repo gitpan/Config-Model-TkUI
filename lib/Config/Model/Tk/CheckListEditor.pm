@@ -1,7 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-10-13 16:40:22 +0200 (Mon, 13 Oct 2008) $
-# $Name: not supported by cvs2svn $
-# $Revision: 775 $
+# $Date: 2008-12-22 14:36:03 +0100 (Mon, 22 Dec 2008) $
+# $Revision: 818 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -33,7 +32,7 @@ use subs qw/menu_struct/ ;
 
 use Tk::NoteBook;
 
-$VERSION = sprintf "1.%04d", q$Revision: 775 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 818 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListEditor';
 
@@ -144,8 +143,8 @@ sub add_change_order_page {
     $cw->{order_list} = $order_list ;
 
     unless (defined $up_img) {
-	$up_img   = $cw->Photo(-file => $icon_path.'go-up.gif');
-	$down_img = $cw->Photo(-file => $icon_path.'go-down.gif');
+	$up_img   = $cw->Photo(-file => $icon_path.'up.png');
+	$down_img = $cw->Photo(-file => $icon_path.'down.png');
     }
 
     my $mv_up_down_frame = $order_frame->Frame->pack( -fill => 'x');

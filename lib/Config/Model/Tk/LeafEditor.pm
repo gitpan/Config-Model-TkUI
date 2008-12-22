@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-05-15 14:00:38 +0200 (Thu, 15 May 2008) $
-# $Revision: 664 $
+# $Date: 2008-12-22 13:19:00 +0100 (Mon, 22 Dec 2008) $
+# $Revision: 815 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl;
 use base qw/Config::Model::Tk::LeafViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 664 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 815 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 
