@@ -1,6 +1,6 @@
 ---
 name: Config-Model-TkUI
-version: 1.204
+version: 1.205
 author:
   - Dominique Dumont (ddumont at cpan dot org)
 abstract: Tk GUI to edit config data through Config::Model
@@ -25,31 +25,31 @@ provides:
     version: 1.0818
   Config::Model::Tk::CheckListViewer:
     file: lib/Config/Model/Tk/CheckListViewer.pm
-    version: 1.0815
+    version: 1.0674
   Config::Model::Tk::HashEditor:
     file: lib/Config/Model/Tk/HashEditor.pm
     version: 1.0805
   Config::Model::Tk::HashViewer:
     file: lib/Config/Model/Tk/HashViewer.pm
-    version: 1.0815
+    version: 1.0630
   Config::Model::Tk::LeafEditor:
     file: lib/Config/Model/Tk/LeafEditor.pm
-    version: 1.0815
+    version: 1.0880
   Config::Model::Tk::LeafViewer:
     file: lib/Config/Model/Tk/LeafViewer.pm
-    version: 1.0815
+    version: 1.0664
   Config::Model::Tk::ListEditor:
     file: lib/Config/Model/Tk/ListEditor.pm
-    version: 1.0815
+    version: 1.0798
   Config::Model::Tk::ListViewer:
     file: lib/Config/Model/Tk/ListViewer.pm
-    version: 1.0815
+    version: 1.0775
   Config::Model::Tk::NodeViewer:
     file: lib/Config/Model/Tk/NodeViewer.pm
-    version: 1.0815
+    version: 1.0667
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.204
+    version: 1.205
 generated_by: Module::Build version 0.3
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

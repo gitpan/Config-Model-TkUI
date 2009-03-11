@@ -1,8 +1,8 @@
 # $Author: ddumont $
-# $Date: 2008-12-22 13:19:00 +0100 (Mon, 22 Dec 2008) $
-# $Revision: 815 $
+# $Date: 2009-03-10 13:16:35 +0100 (mar 10 mar 2009) $
+# $Revision: 880 $
 
-#    Copyright (c) 2008 Dominique Dumont.
+#    Copyright (c) 2008-2009 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUI.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl;
 use base qw/Config::Model::Tk::LeafViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 815 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 880 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 
@@ -80,7 +80,10 @@ sub Populate {
 					      )
                              ->pack(@fbe1);
 	$cw->reset_value ;
-	$cw->add_buttons($ed_frame) ;
+	my $bframe = $cw->add_buttons($ed_frame) ;
+	$bframe -> Button ( -text => 'Cleanup',
+			    -command => sub { $cw->cleanup},
+			  ) -> pack(-side => 'left') ;
     }
     elsif ($vt eq 'boolean') {
 	$ed_frame->Checkbutton(-text => $leaf->element_name,
@@ -108,6 +111,7 @@ sub Populate {
 	map { $lb->selectionSet($idx) if $_ eq $$vref; $idx ++}  @choice;
 	$lb->bind('<Button-1>',sub {$cw->try($lb->get($lb->curselection()))});
 	$cw->add_buttons($ed_frame) ;
+
     }
 
     $inst->pop_no_value_check ;
@@ -131,6 +135,22 @@ sub Populate {
     $cw->Tk::Frame::Populate($args) ;
 }
 
+sub cleanup {
+    my ($cw) = @_ ;
+    my $text_widget = $cw->{e_widget} || return ;
+    my $selected = $text_widget -> getSelected ;
+    my $text = $selected || $text_widget -> Contents ;
+    $text =~ s/^\s+//gm;
+    $text =~ s/\s+$//gm;
+    $text =~ s/\s+/ /g;
+
+    if ($selected) {
+	$text_widget -> Insert ($text) ;
+    } else {
+	$text_widget -> Contents($text) ;
+    }
+}
+
 sub add_buttons {
     my ($cw,$frame) = @_ ;
     my $bframe = $frame->Frame->pack() ;
@@ -142,7 +162,8 @@ sub add_buttons {
 		      ) -> pack(-side => 'left') ;
     $bframe -> Button ( -text => 'Store',
 			-command => sub { $cw->store},
-		      ) -> pack(-side => 'left') ;
+		      ) -> pack(-side => 'right') ;
+    return $bframe ;
 }
 
 

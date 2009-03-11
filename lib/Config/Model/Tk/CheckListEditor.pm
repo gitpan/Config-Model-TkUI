@@ -1,5 +1,5 @@
 # $Author: ddumont $
-# $Date: 2008-12-22 14:36:03 +0100 (Mon, 22 Dec 2008) $
+# $Date: 2008-12-22 14:36:03 +0100 (lun 22 déc 2008) $
 # $Revision: 818 $
 
 #    Copyright (c) 2008 Dominique Dumont.

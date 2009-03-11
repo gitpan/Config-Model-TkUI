@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-12-22 13:19:00 +0100 (Mon, 22 Dec 2008) $
-# $Revision: 815 $
+# $Date: 2008-04-25 14:04:19 +0200 (ven 25 avr 2008) $
+# $Revision: 630 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 815 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 630 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelHashViewer';
 

@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-12-22 13:19:00 +0100 (Mon, 22 Dec 2008) $
-# $Revision: 815 $
+# $Date: 2008-05-19 13:06:27 +0200 (lun 19 mai 2008) $
+# $Revision: 674 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -31,7 +31,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::ROText ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 815 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 674 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListViewer';
 

@@ -1,9 +1,8 @@
-
 # $Author: ddumont $
-# $Date: 2008-12-22 14:36:03 +0100 (Mon, 22 Dec 2008) $
-# $Revision: 818 $
+# $Date: 2009-03-11 17:51:18 +0100 (mer 11 mar 2009) $
+# $Revision: 884 $
 
-#    Copyright (c) 2007,2008 Dominique Dumont.
+#    Copyright (c) 2007,2009 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUI.
 #
@@ -54,7 +53,7 @@ use Config::Model::Tk::HashEditor ;
 use Config::Model::Tk::NodeViewer ;
 
 
-$VERSION = '1.204' ;
+$VERSION = '1.205' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -315,8 +314,10 @@ sub open_item {
 
 sub save_in_dir {
     my $cw = shift ;
-    require Tk::DirSelect ;
+    require Tk::DirSelect ; 
     $cw->{save_dir} = $cw->DirSelect()->Show ;
+    # chooseDirectory does not work correctly.
+    #$cw->{save_dir} = $cw->chooseDirectory(-mustexist => 'no') ;
     $cw->save() ;
 }
 
