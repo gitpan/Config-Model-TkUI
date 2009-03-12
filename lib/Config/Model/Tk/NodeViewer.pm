@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2008-05-15 19:17:47 +0200 (jeu 15 mai 2008) $
-# $Revision: 667 $
+# $Date: 2009-03-12 13:33:03 +0100 (Thu, 12 Mar 2009) $
+# $Revision: 893 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 667 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 893 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelNodeViewer';
 
