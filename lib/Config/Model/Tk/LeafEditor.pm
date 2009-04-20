@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-12 13:33:03 +0100 (Thu, 12 Mar 2009) $
-# $Revision: 893 $
+# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
+# $Revision: 910 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl;
 use base qw/Config::Model::Tk::LeafViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 893 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 
@@ -117,9 +117,7 @@ sub Populate {
     $inst->pop_no_value_check ;
 
     $cw->add_info() ;
-    $cw->add_help_frame() ;
-    $cw->add_help(class   => $leaf->parent->get_help) ;
-    $cw->add_help(element => $leaf->parent->get_help($leaf->element_name)) ;
+    $cw->add_summary_and_description($leaf) ;
     $cw->{value_help_widget} = $cw->add_help(value => '',1);
     $cw->set_value_help ;
 

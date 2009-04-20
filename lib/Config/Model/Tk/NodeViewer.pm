@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-12 13:33:03 +0100 (Thu, 12 Mar 2009) $
-# $Revision: 893 $
+# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
+# $Revision: 910 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 893 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelNodeViewer';
 
@@ -70,12 +70,9 @@ sub Populate {
     }
 
     $cw->add_info($cw) ;
-    my $parent = $node->parent ;
 
-    $cw->add_help_frame() ;
-    if (defined $parent) {
-	$cw->add_help(class   => $parent->get_help) ;
-	$cw->add_help(element => $parent->get_help($node->element_name)) ;
+    if ($node->parent) {
+	$cw->add_summary_and_description($node) ;
     }
     else {
 	$cw->add_help(class   => $node->get_help) ;

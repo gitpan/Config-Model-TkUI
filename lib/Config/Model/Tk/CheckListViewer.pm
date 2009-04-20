@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-12 13:33:03 +0100 (Thu, 12 Mar 2009) $
-# $Revision: 893 $
+# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
+# $Revision: 910 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -31,7 +31,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::ROText ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 893 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListViewer';
 
@@ -63,9 +63,7 @@ sub Populate {
     $rt->tagConfigure('in',-background => 'black', -foreground => 'white') ;
 
     $cw->add_info() ;
-    $cw->add_help_frame() ;
-    $cw->add_help(class   => $leaf->parent->get_help) ;
-    $cw->add_help(element => $leaf->parent->get_help($leaf->element_name)) ;
+    $cw->add_summary_and_description($leaf) ;
     $cw->{value_help_widget} = $cw->add_help(value => '',1);
 
     my %h = $leaf->get_checked_list_as_hash ;

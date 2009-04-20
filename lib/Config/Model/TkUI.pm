@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-12 13:36:55 +0100 (Thu, 12 Mar 2009) $
-# $Revision: 894 $
+# $Date: 2009-04-07 13:16:38 +0200 (Tue, 07 Apr 2009) $
+# $Revision: 920 $
 
 #    Copyright (c) 2007,2009 Dominique Dumont.
 #
@@ -53,7 +53,7 @@ use Config::Model::Tk::HashEditor ;
 use Config::Model::Tk::NodeViewer ;
 
 
-$VERSION = '1.207' ;
+$VERSION = '1.208' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 

@@ -1,8 +1,8 @@
 # $Author: ddumont $
-# $Date: 2009-03-12 13:33:03 +0100 (Thu, 12 Mar 2009) $
-# $Revision: 893 $
+# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
+# $Revision: 910 $
 
-#    Copyright (c) 2008 Dominique Dumont.
+#    Copyright (c) 2008-2009 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUi.
 #
@@ -32,7 +32,7 @@ use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 893 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -93,21 +93,10 @@ sub add_info_frame {
 }
 
 
-sub add_help_frame {
-    my $cw = shift ;
-
-    # FIXME: remove this method
-
-    #my $htop_frame = $cw->Frame()->pack(@fb) ;
-    #$htop_frame -> Label(-text => 'Help', -anchor => 'w' ) ->pack(@f) ;
-
-    #$cw->{help_f} = $htop_frame#->Frame()->pack(@fb) ;
-}
-
 # returns the help widget (Label or ROText)
 sub add_help {
     my $cw = shift ;
-    my $type = shift ;
+    my $help_label = shift ;
     my $help = shift || '' ;
     my $force_text_widget = shift || 0;
 
@@ -116,7 +105,7 @@ sub add_help {
     my $help_frame = $cw-> Frame()->pack(@fbe1);
 
     $help_frame ->Label(
-			 -text => "Help on $type: ", 
+			 -text => $help_label, 
 			) ->pack(-anchor => 'w');
 
     my $widget ;
@@ -143,6 +132,16 @@ sub add_help {
     }
 
     return $widget ;
+}
+
+sub add_summary_and_description {
+    my ($cw, $elt_obj) = @_ ;
+
+    my $p    = $elt_obj->parent ;
+    my $name = $elt_obj->element_name ;
+    foreach my $topic (qw/summary description/) {
+	$cw->add_help( ucfirst($topic), $p->get_help($topic => $name)) ;
+    }
 }
 
 sub add_editor_button {

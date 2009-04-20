@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-12 13:33:03 +0100 (Thu, 12 Mar 2009) $
-# $Revision: 893 $
+# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
+# $Revision: 910 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 893 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -81,9 +81,7 @@ sub Populate {
     my $right_frame = $elt_button_frame->Frame->pack(@fxe1, -side => 'left');
 
     $cw->add_info($cw) ;
-    $cw->add_help_frame() ;
-    $cw->add_help(class   => $list->parent->get_help) ;
-    $cw->add_help(element => $list->parent->get_help($list->element_name)) ;
+    $cw->add_summary_and_description($list) ;
 
     my $value_type = $list->get_cargo_info('value_type') ; # may be undef
     if ($cargo_type eq 'leaf' and $value_type ne 'enum' and $value_type ne 'reference') {
