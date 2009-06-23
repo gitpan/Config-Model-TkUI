@@ -1,7 +1,7 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2008-12-22 13:19:00 +0100 (Mon, 22 Dec 2008) $
-# $Revision: 815 $
+# $Date: 2009-06-23 13:41:22 +0200 (Tue, 23 Jun 2009) $
+# $Revision: 979 $
 use warnings FATAL => qw(all);
 
 use ExtUtils::testlib;
@@ -32,7 +32,7 @@ Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
 
 ok(1,"Compilation done");
 
-my $model = Config::Model -> new (legacy => 'ignore') ;
+my $model = Config::Model -> new () ;
 
 my $inst = $model->instance (root_class_name => 'Master',
                              model_file => 't/big_model.pm',

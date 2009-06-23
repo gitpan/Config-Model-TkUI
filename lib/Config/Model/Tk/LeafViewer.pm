@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
-# $Revision: 910 $
+# $Date: 2009-06-23 13:41:22 +0200 (Tue, 23 Jun 2009) $
+# $Revision: 979 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl ;
 use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 979 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafViewer';
 
@@ -118,8 +118,8 @@ sub add_info {
 		 'type : '.$leaf->value_type.$choice_str,
 		);
 
-    if (defined $leaf->built_in) {
-	push @items, "built_in value: " . $leaf->built_in ;
+    if (defined $leaf->upstream_default) {
+	push @items, "upstream_default value: " . $leaf->upstream_default ;
     }
     elsif (defined $leaf->fetch('standard')) {
 	push @items, "default value: " . $leaf->fetch('standard') ;
