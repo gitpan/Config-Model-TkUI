@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-06-23 13:41:22 +0200 (Tue, 23 Jun 2009) $
-# $Revision: 979 $
+# $Date: 2009-06-29 14:41:07 +0200 (Mon, 29 Jun 2009) $
+# $Revision: 994 $
 
 #    Copyright (c) 2007,2009 Dominique Dumont.
 #
@@ -53,7 +53,7 @@ use Config::Model::Tk::HashEditor ;
 use Config::Model::Tk::NodeViewer ;
 
 
-$VERSION = '1.210' ;
+$VERSION = '1.211' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -382,6 +382,7 @@ sub save {
 
     my $dir = $cw->{save_dir} ;
     my $trace_dir = defined $dir ? $dir : 'default' ;
+    my @wb_args =  defined $dir ? (config_dir => $dir) : () ;
 
     $cw->check() ;
 
@@ -391,7 +392,7 @@ sub save {
     }
     else {
 	$logger->info( "Saving data in $trace_dir directory with instance write_back" );
-	$cw->{root}->instance->write_back($dir);
+	$cw->{root}->instance->write_back(@wb_args);
     }
     $cw->{modified_data} = 0 ;
 }

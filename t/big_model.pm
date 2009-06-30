@@ -1,7 +1,7 @@
 # -*- cperl -*-
 # $Author: ddumont $
-# $Date: 2009-06-23 14:34:38 +0200 (Tue, 23 Jun 2009) $
-# $Revision: 984 $
+# $Date: 2009-06-29 14:41:07 +0200 (Mon, 29 Jun 2009) $
+# $Revision: 994 $
 
 # this file is used by test script
 
@@ -102,6 +102,8 @@
    experience => [ [qw/tree_macro warp/] => 'advanced'] ,
    class_description => "Master description",
    level      => [ [qw/hash_a tree_macro int_v/] => 'important' ],
+   write_config  => [ { backend => 'cds_file' , config_dir => '/foo', auto_create => 1},
+		    ],
    element => [
 	       std_id => { type => 'hash',
 			   index_type  => 'string',
