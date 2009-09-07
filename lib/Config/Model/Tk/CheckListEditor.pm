@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
-# $Revision: 910 $
+# $Date: 2009-07-31 16:37:39 +0200 (Fri, 31 Jul 2009) $
+# $Revision: 1009 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use subs qw/menu_struct/ ;
 
 use Tk::NoteBook;
 
-$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1009 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListEditor';
 
@@ -57,6 +57,7 @@ sub Populate {
     my $leaf = $cw->{leaf} = delete $args->{-item} 
       || die "CheckListEditor: no -item, got ",keys %$args;
     delete $args->{-path} ;
+    $cw->{store_cb} = delete $args->{-store_cb} || die __PACKAGE__,"no -store_cb" ;
 
     my $inst = $leaf->instance ;
 
@@ -213,7 +214,7 @@ sub store {
 	}
     } $cw->{leaf}->get_choice;
 
-    $cw->parent->parent->parent->parent->reload(1) ;
+    $cw->{store_cb}->() ;
 }
 
 sub reset_value {

@@ -1,6 +1,6 @@
 ---
 name: Config-Model-TkUI
-version: 1.211
+version: 1.301
 author:
   - Dominique Dumont (ddumont at cpan dot org)
 abstract: Tk GUI to edit config data through Config::Model
@@ -16,41 +16,48 @@ requires:
   Tk::Tree: 0
 recommends:
   Tk::ObjScanner: 0
+configure_requires:
+  Module::Build: 0.35
 provides:
   Config::Model::Tk::AnyViewer:
     file: lib/Config/Model/Tk/AnyViewer.pm
-    version: 1.0910
+    version: 1.1022
   Config::Model::Tk::CheckListEditor:
     file: lib/Config/Model/Tk/CheckListEditor.pm
-    version: 1.0910
+    version: 1.1009
   Config::Model::Tk::CheckListViewer:
     file: lib/Config/Model/Tk/CheckListViewer.pm
     version: 1.0910
   Config::Model::Tk::HashEditor:
     file: lib/Config/Model/Tk/HashEditor.pm
-    version: 1.0920
+    version: 1.1015
   Config::Model::Tk::HashViewer:
     file: lib/Config/Model/Tk/HashViewer.pm
     version: 1.0910
   Config::Model::Tk::LeafEditor:
     file: lib/Config/Model/Tk/LeafEditor.pm
-    version: 1.0910
+    version: 1.1009
   Config::Model::Tk::LeafViewer:
     file: lib/Config/Model/Tk/LeafViewer.pm
-    version: 1.0979
+    version: 1.1021
   Config::Model::Tk::ListEditor:
     file: lib/Config/Model/Tk/ListEditor.pm
-    version: 1.0910
+    version: 1.1009
   Config::Model::Tk::ListViewer:
     file: lib/Config/Model/Tk/ListViewer.pm
     version: 1.0910
+  Config::Model::Tk::NodeEditor:
+    file: lib/Config/Model/Tk/NodeEditor.pm
+    version: 1.1013
   Config::Model::Tk::NodeViewer:
     file: lib/Config/Model/Tk/NodeViewer.pm
-    version: 1.0910
+    version: 1.1022
+  Config::Model::Tk::Wizard:
+    file: lib/Config/Model/Tk/Wizard.pm
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.211
-generated_by: Module::Build version 0.33
+    version: 1.301
+generated_by: Module::Build version 0.35
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4

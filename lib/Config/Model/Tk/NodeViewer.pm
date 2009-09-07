@@ -1,8 +1,8 @@
 # $Author: ddumont $
-# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
-# $Revision: 910 $
+# $Date: 2009-09-06 17:08:25 +0200 (Sun, 06 Sep 2009) $
+# $Revision: 1022 $
 
-#    Copyright (c) 2008 Dominique Dumont.
+#    Copyright (c) 2008-2009 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUi.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1022 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelNodeViewer';
 
@@ -49,25 +49,32 @@ sub Populate {
     my ($cw, $args) = @_;
     my $node = $cw->{node} = delete $args->{-item} 
       || die "NodeViewer: no -item, got ",keys %$args;
-    delete $args->{-path} ;
+    my $path = delete $args->{-path} ;
 
     $cw->add_header(View => $node) ;
 
     my $inst = $node->instance ;
 
-    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 4/)->pack(@fxe1) ;
+    my $elt_frame = $cw->Frame(qw/-relief flat/)->pack(@fbe1) ;
 
     $elt_frame -> Label(-text => $node->composite_name.' node elements') -> pack() ;
 
-    my $rt = $elt_frame ->Scrolled ( 'ROText',
-				     -height => 10,
-				   ) ->pack(@fbe1) ;
+    my $hl = $elt_frame ->Scrolled ( 'HList',
+				     -scrollbars => 'osow',
+				     -columns => 3, 
+				     -header => 1,
+				     -height => 8,
+				   ) -> pack(@fbe1) ;
+    $hl->headerCreate(0, -text => 'name') ;
+    $hl->headerCreate(1, -text => 'type') ;
+    $hl->headerCreate(2, -text => 'value') ;
+    $cw->{hlist}=$hl ;
+    $cw->reload ;
 
-    my $exp = $cw->parent->parent->parent->parent->get_experience ;
-
-    foreach my $c ($node->get_element_name(for => $exp)) {
-	$rt->insert('end', $c."\n" ) ;
-    }
+    # add adjuster. Buggy behavior on destroy...
+    #require Tk::Adjuster;
+    #$cw->{adjust} = $cw -> Adjuster();
+    #$cw->{adjust}->packAfter($hl, -side => 'top') ;
 
     $cw->add_info($cw) ;
 
@@ -77,9 +84,53 @@ sub Populate {
     else {
 	$cw->add_help(class   => $node->get_help) ;
     }
+
+    $cw->add_editor_button($path) ;
+
     $cw->SUPER::Populate($args) ;
 }
 
+#sub DESTROY {
+#    my $cw = shift ;
+#    $cw->{adjust}->packForget(1);
+#}
+
+sub reload {
+    my $cw = shift ;
+
+    my $exp = $cw->parent->parent->parent->parent->get_experience ;
+    my $node = $cw->{node};
+    my $hl=$cw->{hlist} ;
+
+    my %old_elt = %{$cw->{elt_path}|| {} } ;
+
+    foreach my $c ($node->get_element_name(for => $exp)) {
+	next if delete $old_elt{$c} ;
+
+	$hl->add($c) ;
+	$cw->{elt_path}{$c} = 1 ;
+
+	$hl->itemCreate($c,0, -text => $c) ;
+	my $type = $node->element_type($c) ;
+	$hl->itemCreate($c,1, -text => $type) ;
+
+	if ($type eq 'leaf') {
+	    my $v = eval {$node->fetch_element_value($c)} ;
+	    if ($@) {
+		$hl->itemCreate($c,2, 
+				-itemtype => 'image' , 
+				-image => $Config::Model::TkUI::warn_img) ;
+	    }
+	    elsif (defined $v) {
+		substr ($v,15) = '...' if length($v) > 15;
+		$hl->itemCreate($c,2, -text => $v) ;
+	    }
+	}
+    }
+
+    # destroy leftover widgets (may occur with warp mechanism)
+    map {$hl->delete(entry => $_); } keys %old_elt ;
+}
 
 sub add_info {
     my $cw = shift ;

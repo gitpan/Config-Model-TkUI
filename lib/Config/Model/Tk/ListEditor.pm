@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
-# $Revision: 910 $
+# $Date: 2009-07-31 16:37:39 +0200 (Fri, 31 Jul 2009) $
+# $Revision: 1009 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1009 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelListEditor';
 
@@ -54,6 +54,7 @@ sub Populate {
     my $list = $cw->{list} = delete $args->{-item} 
       || die "ListEditor: no -item, got ",keys %$args;
     delete $args->{-path} ;
+    $cw->{store_cb} = delete $args->{-store_cb} || die __PACKAGE__,"no -store_cb" ;
 
     $cw->add_header(Edit => $list) ;
 
@@ -324,7 +325,7 @@ sub store {
 
 sub reload_tree {
     my $cw = shift ;
-    $cw->parent->parent->parent->parent->reload(1) ;
+    $cw->{store_cb}->() ;
 }
 
 

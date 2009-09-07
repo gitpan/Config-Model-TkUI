@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-06-23 13:41:22 +0200 (Tue, 23 Jun 2009) $
-# $Revision: 979 $
+# $Date: 2009-09-06 14:13:25 +0200 (Sun, 06 Sep 2009) $
+# $Revision: 1021 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl ;
 use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 979 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1021 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafViewer';
 
@@ -67,8 +67,7 @@ sub Populate {
     $cw->add_header(View => $leaf) ;
 
     my @pack_args = @fx ;
-    @pack_args = @fbe1 if $vt eq 'string' or $vt eq 'enum' 
-                       or $vt eq 'reference' ;
+    @pack_args = @fbe1 if $vt eq 'string' ;
     my $lv_frame = $cw->Frame(qw/-relief raised -borderwidth 2/)
       ->pack(@pack_args) ;
     $lv_frame -> Label(-text => 'Value') -> pack() ;

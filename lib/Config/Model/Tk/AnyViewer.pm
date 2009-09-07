@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-03-31 13:41:21 +0200 (Tue, 31 Mar 2009) $
-# $Revision: 910 $
+# $Date: 2009-09-06 17:08:25 +0200 (Sun, 06 Sep 2009) $
+# $Revision: 1022 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 910 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1022 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -154,5 +154,7 @@ sub add_editor_button {
     $cw->Button(-text => 'Edit ...', -command => $sub)-> pack ;
 }
 
+# do nothing by default 
+sub reload { }
 
 1;

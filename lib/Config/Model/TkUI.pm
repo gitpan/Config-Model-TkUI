@@ -1,24 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-06-29 14:41:07 +0200 (Mon, 29 Jun 2009) $
-# $Revision: 994 $
-
-#    Copyright (c) 2007,2009 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUI.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# $Date: 2009-09-07 14:05:34 +0200 (Mon, 07 Sep 2009) $
+# $Revision: 1024 $
 
 package Config::Model::TkUI ;
 
@@ -27,7 +9,7 @@ use warnings ;
 use Carp ;
 
 use base qw/Tk::Toplevel/;
-use vars qw/$VERSION $icon_path/ ;
+use vars qw/$VERSION $icon_path $warn_img/ ;
 use subs qw/menu_struct/ ;
 use Scalar::Util qw/weaken/;
 use Log::Log4perl;
@@ -51,13 +33,15 @@ use Config::Model::Tk::HashViewer ;
 use Config::Model::Tk::HashEditor ;
 
 use Config::Model::Tk::NodeViewer ;
+use Config::Model::Tk::NodeEditor ;
+
+use Config::Model::Tk::Wizard ;
 
 
-$VERSION = '1.211' ;
+$VERSION = '1.301' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
-my $warn_img ;
 my $cust_img ;
 my $tool_img ;
 
@@ -83,7 +67,7 @@ sub Populate {
     unless (defined $warn_img) {
 	$warn_img = $cw->Photo(-file => $icon_path.'stop.png');
 	$cust_img = $cw->Photo(-file => $icon_path.'next.png');
-	# snatched from openclip-arts-png
+	# snatched from openclipart-png
 	$tool_img = $cw->Photo(-file => $icon_path.'tools_nicu_buculei_01.png');
     }
 
@@ -94,12 +78,13 @@ sub Populate {
 	  or croak "Missing $parm arg\n";
     }
 
-    foreach my $parm (qw/-store_sub -quit -experience/) {
+    foreach my $parm (qw/-store_sub -quit/) {
 	my $attr = $parm ;
 	$attr =~ s/^-//;
 	$cw->{$attr} = delete $args->{$parm} ;
     }
 
+    $cw->{experience} = delete $args->{'-experience'} || 'beginner' ;
     my $extra_menu = delete $args->{'-extra-menu'} || [] ;
 
     my $title = delete $args->{'-title'} 
@@ -109,7 +94,7 @@ sub Populate {
     croak "Unknown parameter ",join(' ',keys %$args) if %$args;
 
     # initialize internal attributes
-    $cw->{location} = 'foobar';
+    $cw->{location} = '';
     $cw->{modified_data} = 0;
 
     $cw->setup_scanner() ;
@@ -120,7 +105,8 @@ sub Populate {
     $cw->configure(-menu => $menubar ) ;
     $cw->{my_menu} = $menubar ;
 
-    my $file_items = [[ qw/command reload -command/, sub{ $cw->reload }],
+    my $file_items = [[ qw/command wizard -command/, sub{ $cw->wizard }],
+		      [ qw/command reload -command/, sub{ $cw->reload }],
 		      [ qw/command check  -command/, sub{ $cw->check(1)}],
 		      [ qw/command save   -command/, sub{ $cw->save }],
 		      [ command => 'save in dir ...',
@@ -202,7 +188,10 @@ sub Populate {
     $cw->{e_frame} ->Label(#-text => "placeholder",
 			   -image => $tool_img,
 			   -width => 400, # width in pixel for image
-			  ) -> pack ;
+			  ) -> pack(-side => 'top') ;
+    $cw->{e_frame} ->Button(-text => "Run Wizard !",
+			    -command => sub { $cw->wizard}
+			  ) -> pack(-side => 'bottom') ;
 
     # bind button3 as double-button-1 does not work
     my $b3_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
@@ -253,7 +242,6 @@ another. Beware, there's no "undo" operation.
 EOF
 
 my $todo_text = << 'EOF' ;
-- add wizard
 - add better navigation
 - add tabular view ?
 - improve look and feel
@@ -270,7 +258,7 @@ sub add_help_menu {
     my $about_sub = sub {
 	$cw->Dialog(-title => 'About',
 		    -text => "Config::Model::TkUI \n"
-		    ."(c) 2008 Dominique Dumont \n"
+		    ."(c) 2008-2009 Dominique Dumont \n"
 		    ."Licensed under LGPLv2\n"
 		   ) -> Show ;
     };
@@ -427,8 +415,9 @@ sub quit {
 
 sub reload {
     my $cw =shift ;
-    my $is_modif = shift || 0;
-    my $force_display_obj = shift ;
+    my $is_modif          = shift || 0; # whether values where modified
+    my $force_display_obj = shift ;     # force open editor
+    my $path              = shift ;     # force tree to show this path
 
     $logger->trace("reloading tk tree".
 		   (defined $force_display_obj ? " (forcedisplay)" : '' )
@@ -455,6 +444,8 @@ sub reload {
 
     # the first parameter indicates that we are opening the root
     $sub->(1,$force_display_obj) ; 
+    $tree->see($path) if $path and $tree->info(exists => $path);
+    $cw->{editor}->reload if defined $cw->{editor};
 }
 
 # call-back when Tree element is selected
@@ -772,7 +763,7 @@ my %widget_table = (
 			     check_list => 'ConfigModelCheckListEditor',
 			     list       => 'ConfigModelListEditor',
 			     hash       => 'ConfigModelHashEditor',
-			     node       => 'ConfigModelNodeViewer',
+			     node       => 'ConfigModelNodeEditor',
 			    },
 		    view => {
 			     leaf       => 'ConfigModelLeafViewer',
@@ -786,7 +777,8 @@ my %widget_table = (
 sub create_element_widget {
     my $cw = shift ;
     my $mode = shift ;
-    my $tree_path = shift ; # reserved for tests
+    my $tree_path = shift ; # optional
+    my $obj       = shift ; # optional if tree is not opened to path
 
     my $tree = $cw->{tktree};
 
@@ -797,27 +789,35 @@ sub create_element_widget {
         $tree_path = $tree->nearest($tree->pointery - $tree->rooty) ;
       }
 
-    $tree->selectionClear() ; # clear all
-    $tree->selectionSet($tree_path) ;
-    my $data_ref = $tree->infoData($tree_path);
-    unless (defined $data_ref->[1]) {
-	$cw->reload;
-	return;
-    }
-    my $loc = $data_ref->[1]->location;
+    if ($tree->info(exists => $tree_path)) {
+	$tree->selectionClear() ; # clear all
+	$tree->selectionSet($tree_path) ;
+	my $data_ref = $tree->infoData($tree_path);
+	unless (defined $data_ref->[1]) {
+	    $cw->reload;
+	    return;
+	}
+	$obj = $data_ref->[1] ;
+	#my $loc = $data_ref->[1]->location;
 
-    my $obj = $cw->{root}->grab($loc);
+	#$obj = $cw->{root}->grab($loc);
+    }
+
+    my $loc  = $obj ->location;
     my $type = $obj -> get_type ;
     $logger->trace( "item $loc to $mode (type $type)" );
 
     # cleanup existing widget contained in this frame
+    delete $cw->{editor} ;
     map { $_ ->destroy if Tk::Exists($_) } $cw->{e_frame}->children ;
 
     my $frame = $cw->{e_frame} ;
 
     my $widget = $widget_table{$mode}{$type} 
       || die "Cannot find $mode widget for type $type";
-    $cw->{editor} = $frame -> $widget(-item => $obj, -path => $tree_path ) ;
+    my @store = $mode eq 'edit' ? (-store_cb => sub {$cw->reload(@_)} ) : () ;
+    $cw->{editor} = $frame -> $widget(-item => $obj, -path => $tree_path,
+				      @store ) ;
     $cw->{editor}-> pack(-expand => 1, -fill => 'both') ;
     return $cw->{editor} ;
 }
@@ -907,6 +907,17 @@ sub edit_paste {
     $cw->reload(1) if @$cut_buf;
 }
 
+sub wizard {
+    my $cw = shift ;
+    my $tree = $cw->{tktree} ;
+
+    my $wiz = $cw->ConfigModelWizard (
+				      -root => $cw->{root}, 
+				      -store_cb => sub{ $cw->force_element_display(@_)},
+				     ) ;
+    $wiz->start_wizard($cw->{experience}) ;
+}
+
 1;
 
 __END__
@@ -943,6 +954,9 @@ With this class, L<Config::Model> and an actual configuration
 model (like L<Config::Model::Xorg>), you get a tool to 
 edit configuration files (e.g. C</etc/X11/xorg.conf>).
 
+Be default, only items with C<beginner> experience are shown. You can
+change the C<experience> level in C<< Options -> experience >> menu.
+
 =head1 USAGE
 
 =head2 Left side tree
@@ -969,6 +983,15 @@ When clicking on store, the new data is stored in the tree represented
 on the left side of TkUI. The new data will be stored in the
 configuration file only when C<File->save> menu is invoked.
 
+=head2 Wizard
+
+A wizard can be launched either with C<< File -> Wizard >> menu entry
+or with C<Run Wizard> button.
+
+The wizard will scan the configuration tree and stop on all items
+flagged as important in the model. It will also stop on all erroneous
+items (mostly missing mandatory values).
+
 =head2 TODO
 
 Document widget options. (-root_model and -store_sub, -quit)
@@ -979,7 +1002,7 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 LICENSE
 
-    Copyright (c) 2008 Dominique Dumont.
+    Copyright (c) 2008-2009 Dominique Dumont.
 
     This file is part of Config-Model.
 
@@ -997,24 +1020,6 @@ Dominique Dumont, (ddumont at cpan dot org)
     along with Config-Model; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
     02110-1301 USA
-
-=head1 SEE ALSO
-
-=over
-
-=item *
-
-L<Config::Model>
-
-=item *
-
-http://config-model.wiki.sourceforge.net/
-
-=item *
-
-Config::Model mailing lists on http://sourceforge.net/mail/?group_id=155650
-
-=back
 
 =head1 FEEDBACK and HELP wanted
 
@@ -1051,6 +1056,23 @@ If you want to help, please send a mail to:
 
   config-mode-devel at lists.sourceforge.net
 
-=cut
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Config::Model>
+
+=item *
+
+http://config-model.wiki.sourceforge.net/
+
+=item *
+
+Config::Model mailing lists on http://sourceforge.net/mail/?group_id=155650
+
+=back
+
 
 
