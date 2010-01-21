@@ -1,23 +1,15 @@
 ---
-name: Config-Model-TkUI
-version: 1.301
+abstract: 'Tk GUI to edit config data through Config::Model'
 author:
-  - Dominique Dumont (ddumont at cpan dot org)
-abstract: Tk GUI to edit config data through Config::Model
-license: lgpl
-resources:
-  license: http://opensource.org/licenses/lgpl-license.php
-requires:
-  Config::Model: 0.638
-  Exception::Class: 0
-  Log::Log4perl: 1.11
-  Tk: 0
-  Tk::DirSelect: 0
-  Tk::Tree: 0
-recommends:
-  Tk::ObjScanner: 0
+  - 'Dominique Dumont (ddumont at cpan dot org)'
 configure_requires:
-  Module::Build: 0.35
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Model-TkUI
 provides:
   Config::Model::Tk::AnyViewer:
     file: lib/Config/Model/Tk/AnyViewer.pm
@@ -30,13 +22,13 @@ provides:
     version: 1.0910
   Config::Model::Tk::HashEditor:
     file: lib/Config/Model/Tk/HashEditor.pm
-    version: 1.1015
+    version: 1.1050
   Config::Model::Tk::HashViewer:
     file: lib/Config/Model/Tk/HashViewer.pm
     version: 1.0910
   Config::Model::Tk::LeafEditor:
     file: lib/Config/Model/Tk/LeafEditor.pm
-    version: 1.1009
+    version: 1.1034
   Config::Model::Tk::LeafViewer:
     file: lib/Config/Model/Tk/LeafViewer.pm
     version: 1.1021
@@ -51,13 +43,21 @@ provides:
     version: 1.1013
   Config::Model::Tk::NodeViewer:
     file: lib/Config/Model/Tk/NodeViewer.pm
-    version: 1.1022
+    version: 1.1050
   Config::Model::Tk::Wizard:
     file: lib/Config/Model/Tk/Wizard.pm
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.301
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: 1.302
+recommends:
+  Tk::ObjScanner: 0
+requires:
+  Config::Model: 0.638
+  Exception::Class: 0
+  Log::Log4perl: 1.11
+  Tk: 0
+  Tk::DirSelect: 0
+  Tk::Tree: 0
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 1.302

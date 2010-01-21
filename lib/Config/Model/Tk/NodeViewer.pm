@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-09-06 17:08:25 +0200 (Sun, 06 Sep 2009) $
-# $Revision: 1022 $
+# $Date: 2010-01-21 14:20:47 +0100 (Thu, 21 Jan 2010) $
+# $Revision: 1050 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1022 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1050 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelNodeViewer';
 
@@ -105,25 +105,37 @@ sub reload {
     my %old_elt = %{$cw->{elt_path}|| {} } ;
 
     foreach my $c ($node->get_element_name(for => $exp)) {
-	next if delete $old_elt{$c} ;
-
-	$hl->add($c) ;
-	$cw->{elt_path}{$c} = 1 ;
-
-	$hl->itemCreate($c,0, -text => $c) ;
 	my $type = $node->element_type($c) ;
-	$hl->itemCreate($c,1, -text => $type) ;
+
+	unless (delete $old_elt{$c}) {
+	    # create item
+	    $hl->add($c) ;
+	    $cw->{elt_path}{$c} = 1 ;
+
+	    $hl->itemCreate($c,0, -text => $c) ;
+	    $hl->itemCreate($c,1, -text => $type) ;
+	    $hl->itemCreate($c,2, 
+			    -itemtype => 'imagetext' ,
+			    -text => '', 
+			    -showimage => 0,
+			    -image => $Config::Model::TkUI::warn_img) ;
+	}
 
 	if ($type eq 'leaf') {
+	    # update displayed value
 	    my $v = eval {$node->fetch_element_value($c)} ;
 	    if ($@) {
-		$hl->itemCreate($c,2, 
-				-itemtype => 'image' , 
-				-image => $Config::Model::TkUI::warn_img) ;
+		$hl->itemConfigure($c,2, 
+				   -showtext => 0 ,
+				   -showimage => 1,
+				   ) ;
 	    }
 	    elsif (defined $v) {
 		substr ($v,15) = '...' if length($v) > 15;
-		$hl->itemCreate($c,2, -text => $v) ;
+		$hl->itemConfigure($c,2,  
+				   -showtext => 1 ,
+				   -showimage => 0,
+				   -text => $v) ;
 	    }
 	}
     }

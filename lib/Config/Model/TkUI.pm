@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-09-07 14:05:34 +0200 (Mon, 07 Sep 2009) $
-# $Revision: 1024 $
+# $Date: 2010-01-21 18:17:54 +0100 (Thu, 21 Jan 2010) $
+# $Revision: 1053 $
 
 package Config::Model::TkUI ;
 
@@ -38,7 +38,7 @@ use Config::Model::Tk::NodeEditor ;
 use Config::Model::Tk::Wizard ;
 
 
-$VERSION = '1.301' ;
+$VERSION = '1.302' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -380,7 +380,13 @@ sub save {
     }
     else {
 	$logger->info( "Saving data in $trace_dir directory with instance write_back" );
-	$cw->{root}->instance->write_back(@wb_args);
+	eval { $cw->{root}->instance->write_back(@wb_args); } ;
+	if ($@) {
+	  $cw -> Dialog ( -title => 'Save error',
+			  -text  => "$@",
+			)
+            -> Show ;
+	}
     }
     $cw->{modified_data} = 0 ;
 }
@@ -870,6 +876,7 @@ sub edit_paste {
 
     my @selected = @_ ? @_ : $tkt -> info('selection');
 
+    return unless @selected ;
     #print "edit_paste in @selected\n";
     my @res ;
 
@@ -1002,7 +1009,7 @@ Dominique Dumont, (ddumont at cpan dot org)
 
 =head1 LICENSE
 
-    Copyright (c) 2008-2009 Dominique Dumont.
+    Copyright (c) 2008-2010 Dominique Dumont.
 
     This file is part of Config-Model.
 

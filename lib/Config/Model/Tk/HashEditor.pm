@@ -1,8 +1,8 @@
 # $Author: ddumont $
-# $Date: 2009-09-04 17:59:46 +0200 (Fri, 04 Sep 2009) $
-# $Revision: 1015 $
+# $Date: 2010-01-21 14:20:47 +0100 (Thu, 21 Jan 2010) $
+# $Revision: 1050 $
 
-#    Copyright (c) 2008 Dominique Dumont.
+#    Copyright (c) 2008-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUI.
 #
@@ -34,7 +34,7 @@ use Tk::Dialog ;
 use Tk::Photo ;
 use Tk::Balloon ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1015 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1050 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelHashEditor';
 
@@ -171,7 +171,7 @@ sub Populate {
     $del_rm_frame -> Button ( -text => 'Remove all',
 			      -command => sub { $hash->clear ; 
 						$tklist->delete(0,'end');
-						$cw->reload_tree;
+						$cw->reload_tree(1);
 						$item = '';
 					    },
 			    ) -> pack(-side => 'left', @fxe1) ;
