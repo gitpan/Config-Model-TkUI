@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-09-06 17:08:25 +0200 (Sun, 06 Sep 2009) $
-# $Revision: 1022 $
+# $Date: 2010-01-29 14:22:45 +0100 (Fri, 29 Jan 2010) $
+# $Revision: 1061 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ use Config::Model::TkUI ;
 
 use vars qw/$VERSION $icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1022 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1061 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -119,7 +119,9 @@ sub add_help {
 					-height => 4,
 				       );
 
-	$widget ->pack( @fbe1 ) ->insert('end',$help) ;
+	$widget ->pack( @fbe1 ) ->insert('end',$help,'help') ;
+	$widget
+	  ->tagConfigure(qw/help -lmargin1 2 -lmargin2 2 -rmargin 2/);
     }
     else {
 	$widget = $help_frame->Label( -text => $help,

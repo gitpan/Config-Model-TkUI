@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-06-29 14:41:07 +0200 (Mon, 29 Jun 2009) $
-# $Revision: 994 $
+# $Date: 2010-02-26 14:08:10 +0100 (Fri, 26 Feb 2010) $
+# $Revision: 1098 $
 
 #    Copyright (c) 2007-2009 Dominique Dumont.
 #
@@ -32,7 +32,7 @@ my $build = Module::Build->new
    dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
    requires => {
-		'Config::Model'    => '0.638',
+		'Config::Model'    => '0.643',
 		'Exception::Class' => 0,
 		'Tk'               => 0,
 		'Tk::DirSelect'    => 0,

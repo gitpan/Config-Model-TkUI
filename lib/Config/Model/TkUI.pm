@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2010-01-21 18:17:54 +0100 (Thu, 21 Jan 2010) $
-# $Revision: 1053 $
+# $Date: 2010-02-26 14:08:10 +0100 (Fri, 26 Feb 2010) $
+# $Revision: 1098 $
 
 package Config::Model::TkUI ;
 
@@ -38,7 +38,7 @@ use Config::Model::Tk::NodeEditor ;
 use Config::Model::Tk::Wizard ;
 
 
-$VERSION = '1.302' ;
+$VERSION = '1.303' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 

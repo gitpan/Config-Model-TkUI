@@ -1,6 +1,6 @@
 # $Author: ddumont $
-# $Date: 2009-09-25 15:18:13 +0200 (Fri, 25 Sep 2009) $
-# $Revision: 1034 $
+# $Date: 2010-01-29 14:22:45 +0100 (Fri, 29 Jan 2010) $
+# $Revision: 1061 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -30,7 +30,7 @@ use Log::Log4perl;
 use base qw/Config::Model::Tk::LeafViewer/;
 use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1034 $ =~ /(\d+)/;
+$VERSION = sprintf "1.%04d", q$Revision: 1061 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 
@@ -80,6 +80,8 @@ sub Populate {
 						-scrollbars => 'ow',
 					      )
                              ->pack(@fbe1);
+	$cw->{e_widget}
+	  ->tagConfigure(qw/value -lmargin1 2 -lmargin2 2 -rmargin 2/);
 	$cw->reset_value ;
 	my $bframe = $cw->add_buttons($ed_frame) ;
 	$bframe -> Button ( -text => 'Cleanup',
@@ -260,7 +262,7 @@ sub reset_value {
     $cw->{value} = $cw->{leaf}->fetch ;
     if (defined $cw->{e_widget}) {
 	$cw->{e_widget}->delete('1.0','end') ;
-	$cw->{e_widget}->insert('end',$cw->{value}) ;
+	$cw->{e_widget}->insert('end',$cw->{value},'value') ;
     }
     $cw->set_value_help if defined $cw->{value_help_widget};
 }

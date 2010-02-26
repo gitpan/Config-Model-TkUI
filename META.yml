@@ -4,7 +4,7 @@ author:
   - 'Dominique Dumont (ddumont at cpan dot org)'
 configure_requires:
   Module::Build: 0.36
-generated_by: 'Module::Build version 0.3601'
+generated_by: 'Module::Build version 0.3603'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -13,7 +13,7 @@ name: Config-Model-TkUI
 provides:
   Config::Model::Tk::AnyViewer:
     file: lib/Config/Model/Tk/AnyViewer.pm
-    version: 1.1022
+    version: 1.1061
   Config::Model::Tk::CheckListEditor:
     file: lib/Config/Model/Tk/CheckListEditor.pm
     version: 1.1009
@@ -25,19 +25,19 @@ provides:
     version: 1.1050
   Config::Model::Tk::HashViewer:
     file: lib/Config/Model/Tk/HashViewer.pm
-    version: 1.0910
+    version: 1.1086
   Config::Model::Tk::LeafEditor:
     file: lib/Config/Model/Tk/LeafEditor.pm
-    version: 1.1034
+    version: 1.1061
   Config::Model::Tk::LeafViewer:
     file: lib/Config/Model/Tk/LeafViewer.pm
-    version: 1.1021
+    version: 1.1061
   Config::Model::Tk::ListEditor:
     file: lib/Config/Model/Tk/ListEditor.pm
     version: 1.1009
   Config::Model::Tk::ListViewer:
     file: lib/Config/Model/Tk/ListViewer.pm
-    version: 1.0910
+    version: 1.1086
   Config::Model::Tk::NodeEditor:
     file: lib/Config/Model/Tk/NodeEditor.pm
     version: 1.1013
@@ -48,11 +48,11 @@ provides:
     file: lib/Config/Model/Tk/Wizard.pm
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.302
+    version: 1.303
 recommends:
   Tk::ObjScanner: 0
 requires:
-  Config::Model: 0.638
+  Config::Model: 0.643
   Exception::Class: 0
   Log::Log4perl: 1.11
   Tk: 0
@@ -60,4 +60,4 @@ requires:
   Tk::Tree: 0
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
-version: 1.302
+version: 1.303
