@@ -48,7 +48,7 @@ provides:
     file: lib/Config/Model/Tk/Wizard.pm
   Config::Model::TkUI:
     file: lib/Config/Model/TkUI.pm
-    version: 1.303
+    version: 1.304
 recommends:
   Tk::ObjScanner: 0
 requires:
@@ -60,4 +60,4 @@ requires:
   Tk::Tree: 0
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
-version: 1.303
+version: 1.304
