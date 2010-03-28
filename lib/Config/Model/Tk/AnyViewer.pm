@@ -1,6 +1,3 @@
-# $Author: ddumont $
-# $Date: 2010-01-29 14:22:45 +0100 (Fri, 29 Jan 2010) $
-# $Revision: 1061 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -30,9 +27,8 @@ use Tk::Photo ;
 use Tk::ROText;
 use Config::Model::TkUI ;
 
-use vars qw/$VERSION $icon_path/ ;
+use vars qw/$icon_path/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1061 $ =~ /(\d+)/;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -59,8 +55,10 @@ sub add_header {
     my $class = defined $parent ? $item->parent->config_class_name 
               :                   $item->config_class_name ;
 
-    my $label = "$type: Class $class";
-    $label .= "- Element $elt_name" if defined $parent ;
+    $cw->{config_class_name} = $class ;
+
+    my $label = "$type: ";
+    $label .= $item->location || "Class $class" ;
     my $f = $cw -> Frame -> pack (@fx);
 
     $f -> Label (-image => $img{lc($type)} , -anchor => 'w') 
@@ -77,7 +75,7 @@ my $text_font = [qw/-family Arial -weight normal/] ;
 
 sub add_info_frame {
     my $cw = shift;
-    my @items = @_;
+    my @items = ( "Config class: ". $cw->{config_class_name}, @_ );
 
     my $frame = $cw->Frame()->pack(@fx) ;
     $frame -> Label(-text => 'Info', -anchor => 'w' ) ->pack(qw/-fill x/) ;

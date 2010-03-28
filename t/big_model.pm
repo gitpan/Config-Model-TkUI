@@ -1,7 +1,4 @@
 # -*- cperl -*-
-# $Author: ddumont $
-# $Date: 2009-09-15 14:00:19 +0200 (Tue, 15 Sep 2009) $
-# $Revision: 1028 $
 
 # this file is used by test script
 

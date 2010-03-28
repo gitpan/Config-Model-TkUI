@@ -1,8 +1,5 @@
-# $Author: ddumont $
-# $Date: 2009-09-03 14:05:31 +0200 (Thu, 03 Sep 2009) $
-# $Revision: 1013 $
 
-#    Copyright (c) 2009 Dominique Dumont.
+#    Copyright (c) 2009-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUi.
 #
@@ -31,15 +28,14 @@ use Tk::Balloon;
 use Text::Wrap;
 
 use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
-use vars qw/$VERSION/ ;
 use subs qw/menu_struct/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1013 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelNodeEditor';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill x    -expand 0/ ;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
@@ -108,7 +104,7 @@ sub fill_pane {
 
 	my @after = $old_f ? ( -after => $old_f ) : () ;
 	my $f = $elt_pane->Frame(-relief=> 'groove', -borderwidth => 1)
-	  ->pack(-side =>'top',@fxe1,@after) ;
+	  ->pack(-side =>'top',@fx,@after) ;
 	$old_f = $f ;
 
 	$cw->{elt_widgets}{$c} = $f ;
@@ -131,6 +127,7 @@ sub fill_pane {
 		my $e = $f->Entry(-textvariable => \$v)
 		  ->pack(qw/-side left -anchor w/,@fxe1) ;
 		$e->bind("<Return>" => $store_sub) ;
+		$e->bind("<FocusOut>" => $store_sub) ;
 		next ;
 	    }
 

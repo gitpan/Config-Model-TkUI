@@ -1,6 +1,3 @@
-# $Author: ddumont $
-# $Date: 2010-01-29 14:22:45 +0100 (Fri, 29 Jan 2010) $
-# $Revision: 1061 $
 
 #    Copyright (c) 2008-2009 Dominique Dumont.
 #
@@ -28,9 +25,7 @@ use Carp ;
 use Log::Log4perl;
 
 use base qw/Config::Model::Tk::LeafViewer/;
-use vars qw/$VERSION/ ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1061 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafEditor';
 

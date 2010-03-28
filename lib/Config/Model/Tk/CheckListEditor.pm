@@ -1,6 +1,3 @@
-# $Author: ddumont $
-# $Date: 2009-07-31 16:37:39 +0200 (Fri, 31 Jul 2009) $
-# $Revision: 1009 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -27,12 +24,11 @@ use warnings ;
 use Carp ;
 
 use base qw/ Tk::Frame Config::Model::Tk::CheckListViewer/;
-use vars qw/$VERSION $icon_path/ ;
+use vars qw/$icon_path/ ;
 use subs qw/menu_struct/ ;
 
 use Tk::NoteBook;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1009 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelCheckListEditor';
 

@@ -1,6 +1,3 @@
-# $Author: ddumont $
-# $Date: 2010-01-29 14:22:45 +0100 (Fri, 29 Jan 2010) $
-# $Revision: 1061 $
 
 #    Copyright (c) 2008 Dominique Dumont.
 #
@@ -28,9 +25,6 @@ use Carp ;
 use Log::Log4perl ;
 
 use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
-use vars qw/$VERSION/ ;
-
-$VERSION = sprintf "1.%04d", q$Revision: 1061 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelLeafViewer';
 
@@ -92,7 +86,7 @@ sub Populate {
 
     $cw->add_info() ;
     $cw->add_summary_and_description($leaf) ;
-    $cw->add_help(value   => $leaf->get_help($cw->{value})) ;
+    $cw->add_help('value help'   => $leaf->get_help($cw->{value})) ;
     $cw->add_editor_button($path) ;
 
     $cw->ConfigSpecs(

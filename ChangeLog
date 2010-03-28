@@ -1,3 +1,30 @@
+2010-03-27  Dominique Dumont  <domi.dumont@free.fr> 1.305
+
+	* Build.PL: depends on Pod::POM and on Config::Model >= 1.001
+
+	* lib/Config/Model/TkUI.pm (Populate): bound Ctrl-C and Ctrl-V to
+	copy and paste in configuration tree widget.
+	(Populate): use Pod::POM to display help from pod documentation
+
+2010-03-22  Dominique Dumont  <domi.dumont@free.fr>
+
+	* lib/Config/Model/Tk/Wizard.pm: Force tree to show item to edit
+	when displaying the wizard page for the item.
+
+2010-03-16  Dominique Dumont  <dominique.dumont@hp.com>
+
+	* lib/Config/Model/TkUI.pm (on_cut_buffer_dump): When button-2 is
+	pressed above a lead, store cut buffer content in the leaf. When
+	pressed above a hash, creates a new hash key for each line in the
+	cut buffer.
+
+	* lib/Config/Model/Tk/AnyViewer.pm (add_info_frame): display
+	config parameter location in the tree on the top of all editor and
+	viewer widgets. This will make the wizard easier to use.
+
+	* lib/Config/Model/Tk/NodeEditor.pm (fill_pane): Stored entered
+	data when widget looses keyboard focus
+
 2010-03-12  Dominique Dumont  <dominique.dumont@hp.com> 1.304
 
 	* lib/Config/Model/TkUI.pm (disp_hash): Fix bug that messed tk

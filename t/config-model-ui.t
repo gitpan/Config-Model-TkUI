@@ -1,7 +1,7 @@
 # -*- cperl -*-
-# $Author: ddumont $
-# $Date: 2009-09-04 14:29:16 +0200 (Fri, 04 Sep 2009) $
-# $Revision: 1014 $
+# $Author$
+# $Date$
+# $Revision$
 use warnings FATAL => qw(all);
 
 use ExtUtils::testlib;
@@ -19,7 +19,6 @@ my $arg = shift || '';
 my ($log,$show) = (0) x 2 ;
 
 my $trace = $arg =~ /t/ ? 1 : 0 ;
-$::verbose          = 1 if $arg =~ /v/;
 $::debug            = 1 if $arg =~ /d/;
 $log                = 1 if $arg =~ /l/;
 $show               = 1 if $arg =~ /s|i/;

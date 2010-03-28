@@ -1,8 +1,4 @@
-# $Author: ddumont $
-# $Date: 2010-02-26 14:08:10 +0100 (Fri, 26 Feb 2010) $
-# $Revision: 1098 $
-
-#    Copyright (c) 2007-2009 Dominique Dumont.
+#    Copyright (c) 2007-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUI.
 #
@@ -32,12 +28,13 @@ my $build = Module::Build->new
    dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
    requires => {
-		'Config::Model'    => '0.643',
+		'Config::Model'    => '1.001',
 		'Exception::Class' => 0,
 		'Tk'               => 0,
 		'Tk::DirSelect'    => 0,
 		'Tk::Tree'         => 0,
 		'Log::Log4perl'    => '1.11', # for TRACE log level
+		'Pod::POM'         => 0,
 	       },
    recommends => {
 		  'Tk::ObjScanner' => 0, # for TkUI debug menu

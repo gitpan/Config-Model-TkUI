@@ -1,6 +1,4 @@
-# $Author: ddumont $
-# $Date: 2010-02-26 14:08:10 +0100 (Fri, 26 Feb 2010) $
-# $Revision: 1098 $
+# copyright at the end of the file in the pod section
 
 package Config::Model::TkUI ;
 
@@ -9,10 +7,13 @@ use warnings ;
 use Carp ;
 
 use base qw/Tk::Toplevel/;
-use vars qw/$VERSION $icon_path $warn_img/ ;
+use vars qw/$icon_path $warn_img/ ;
 use subs qw/menu_struct/ ;
 use Scalar::Util qw/weaken/;
 use Log::Log4perl;
+
+use Pod::POM;
+use Pod::POM::View::Text ;
 
 use Tk::Photo ;
 use Tk::PNG ; # required for Tk::Photo to be able to load pngs
@@ -37,8 +38,7 @@ use Config::Model::Tk::NodeEditor ;
 
 use Config::Model::Tk::Wizard ;
 
-
-$VERSION = '1.304' ;
+our $VERSION = '1.305' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -121,11 +121,12 @@ sub Populate {
 
     $cw->add_help_menu($menubar) ;
 
-    my $edit_items = [
-		      # [ qw/command cut   -command/, sub{ $cw->edit_cut }],
-		      [ qw/command copy  -command/, sub{ $cw->edit_copy }],
-		      [ qw/command paste -command/, sub{ $cw->edit_paste }],
-		     ];
+    my $edit_items 
+      = [
+	 # [ qw/command cut   -command/, sub{ $cw->edit_cut }],
+	 [ command => 'copy (Ctrl-C)', '-command', sub{ $cw->edit_copy }],
+	 [ command => 'paste (Ctrl-V)','-command', sub{ $cw->edit_paste }],
+	];
     $menubar->cascade( -label => 'Edit', -menuitems => $edit_items ) ; 
 
     my $exp_ref = $cw->{scanner}->get_experience_ref ;
@@ -198,6 +199,19 @@ sub Populate {
 		     $cw->on_select($item)} ;
     $tree->bind('<Button-3>', $b3_sub) ;
 
+    # bind button2 to get cut buffer content and try to store cut buffer content
+    my $b2_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
+		     $cw->on_cut_buffer_dump($item)} ;
+    $tree->bind('<Button-2>', $b2_sub) ;
+
+    $tree->bind('<Control-c>',  sub{ $cw->edit_copy }) ;
+    $tree->bind('<Control-v>',  sub{ $cw->edit_paste }) ;
+
+    # bind button2 to get cut buffer content and try to store cut buffer content
+    #my $key_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
+    #$cw->on_key_press($item)} ;
+    #$tree->bind('<KeyPress>', $key_sub) ;
+
     $args->{-title} = $title;
     $cw->SUPER::Populate($args) ;
 
@@ -220,37 +234,20 @@ sub Populate {
 
 }
 
-my $help_text = << 'EOF' ;
 
-Tree usage (left hand side of widget)
+my $parser = Pod::POM->new();
 
-* Click on '+' and '-' boxes to open or close content
-* Left-click on item to open a viewer widget.
-* Right-click on any item to open an editor widget
+# parse from my documentation
+my $pom = $parser->parse_file(__FILE__) 
+  || die $parser->error();
 
-Editor widget usage
-
-When clicking on store, the new data is stored in the tree represented
-on the left side of TkUI. The new data will be stored in the
-configuration file only when "File->save" menu is invoked.
-
-Copy'n'paste
-
-You copy and paste content from one part of the tree to
-another. Beware, there's no "undo" operation.
-
-EOF
-
-my $todo_text = << 'EOF' ;
-- add better navigation
-- add tabular view ?
-- improve look and feel
-- add search element or search value
-- expand the whole tree at once
-- add plug-in mechanism so that dedicated widget
-  can be used for some config Class (Could be handy for 
-  Xorg::ServerLayout)
-EOF
+my $help_text;
+my $todo_text;
+foreach my $head1 ($pom->head1()) {
+    $help_text = Pod::POM::View::Text->view_head1($head1)
+      if $head1->title eq 'USAGE';
+    $todo_text = $head1->content if $head1->title eq 'TODO';
+}
 
 sub add_help_menu {
     my ($cw,$menubar) = @_ ;
@@ -258,7 +255,7 @@ sub add_help_menu {
     my $about_sub = sub {
 	$cw->Dialog(-title => 'About',
 		    -text => "Config::Model::TkUI \n"
-		    ."(c) 2008-2009 Dominique Dumont \n"
+		    ."(c) 2008-2010 Dominique Dumont \n"
 		    ."Licensed under LGPLv2\n"
 		   ) -> Show ;
     };
@@ -272,7 +269,7 @@ sub add_help_menu {
 
     my $help_sub = sub{
 	my $db = $cw->DialogBox( -title => 'help');
-	my $text = $db -> add('ROText')->pack ;
+	my $text = $db -> add('Scrolled','ROText')->pack ;
 	$text ->insert('end',$help_text) ;
 	$db-> Show ;
     };
@@ -475,6 +472,32 @@ sub on_select {
     $cw->create_element_widget('edit') ;
 }
 
+sub on_cut_buffer_dump {
+    my ($cw,$tree_path) = @_ ;
+    $cw->update_loc_bar($tree_path) ;
+
+    # get cut buffer content, See Perl/Tk book p297
+    my $sel = eval { $cw->SelectionGet ;} ;
+
+    return if $@ ; # no selection
+
+    my $obj = $cw->{tktree}->infoData($tree_path)->[1];
+
+    if ($obj->isa('Config::Model::Value')) {
+	# if leaf store content 
+	$obj->store($sel)
+    }
+    elsif ($obj->isa('Config::Model::HashId')) {
+	# if hash create keys
+	my @keys = ($sel =~ /\n/m) ? split(/\n/,$sel) : ($sel) ;
+	map{ $obj->fetch_with_id($_) } @keys ;
+    }
+    # else ignore
+
+    # display result
+    $cw->reload ;
+    $cw->create_element_widget('view') ;
+}
 
 # replace dot in str by _|_
 sub to_path   { my $str  = shift ; $str  =~ s/\./_|_/g; return $str ;}
@@ -865,7 +888,8 @@ sub edit_copy {
 		      $cfg_elt->composite_name,
 		      $type,
 		      $cfg_class ,
-		      $cfg_elt->dump_as_data()] ;
+		      $cfg_elt->dump_as_data() 
+		    ] ;
     }
 
     $cw->{cut_buffer} = \@res ;
@@ -923,10 +947,13 @@ sub wizard {
     my $cw = shift ;
     my $tree = $cw->{tktree} ;
 
-    my $wiz = $cw->ConfigModelWizard (
-				      -root => $cw->{root}, 
-				      -store_cb => sub{ $cw->force_element_display(@_)},
-				     ) ;
+    my $wiz = $cw->ConfigModelWizard 
+      (
+       -root => $cw->{root}, 
+       -store_cb => sub{ $cw->force_element_display(@_)},
+       -show_cb => sub{ $cw->force_element_display(@_)},
+      ) ;
+
     $wiz->start_wizard($cw->{experience}) ;
 }
 
@@ -987,13 +1014,29 @@ Left-click on item to open a viewer widget.
 
 Right-click on any item to open an editor widget
 
+=item *
+
+Use Ctrl-C to copy configuration data in an internal buffer 
+
+=item *
+
+Use Ctrl-V to copy configuration data from the internal buffer to the
+configuration tree. Beware, there's no "undo" operation.
+
+=item *
+
+Pasting cut buffer into a leaf element will store the content of the
+buffer into the element. This should be used with C<string> or
+C<uniline> elements.
+
 =back
 
 =head2 Editor widget
 
-When clicking on store, the new data is stored in the tree represented
-on the left side of TkUI. The new data will be stored in the
-configuration file only when C<File->save> menu is invoked.
+The right side of the widget is either a viewer or an editor. When
+clicking on store in the editor, the new data is stored in the tree
+represented on the left side of TkUI. The new data will be stored in
+the configuration file only when C<File->save> menu is invoked.
 
 =head2 Wizard
 
@@ -1004,9 +1047,17 @@ The wizard will scan the configuration tree and stop on all items
 flagged as important in the model. It will also stop on all erroneous
 items (mostly missing mandatory values).
 
-=head2 TODO
+=head1 TODO
 
-Document widget options. (-root_model and -store_sub, -quit)
+- Document widget options. (-root_model and -store_sub, -quit)
+- add better navigation
+- add tabular view ?
+- improve look and feel
+- add search element or search value
+- expand the whole tree at once
+- add plug-in mechanism so that dedicated widget
+  can be used for some config Class (Could be handy for 
+  Xorg::ServerLayout)
 
 =head1 AUTHOR
 

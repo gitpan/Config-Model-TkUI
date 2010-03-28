@@ -1,6 +1,3 @@
-# $Author: ddumont $
-# $Date: 2010-01-21 14:20:47 +0100 (Thu, 21 Jan 2010) $
-# $Revision: 1050 $
 
 #    Copyright (c) 2008-2010 Dominique Dumont.
 #
@@ -28,13 +25,12 @@ use Carp ;
 use Log::Log4perl ;
 
 use base qw/Config::Model::Tk::HashViewer/;
-use vars qw/$VERSION $icon_path/ ;
+use vars qw/$icon_path/ ;
 use subs qw/menu_struct/ ;
 use Tk::Dialog ;
 use Tk::Photo ;
 use Tk::Balloon ;
 
-$VERSION = sprintf "1.%04d", q$Revision: 1050 $ =~ /(\d+)/;
 
 Construct Tk::Widget 'ConfigModelHashEditor';
 
