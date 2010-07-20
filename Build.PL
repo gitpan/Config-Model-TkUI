@@ -1,3 +1,12 @@
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 #    Copyright (c) 2007-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUI.
@@ -28,7 +37,7 @@ my $build = Module::Build->new
    dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
    requires => {
-		'Config::Model'    => '1.001',
+		'Config::Model'    => '1.202',
 		'Exception::Class' => 0,
 		'Tk'               => 0,
 		'Tk::DirSelect'    => 0,

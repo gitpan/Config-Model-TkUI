@@ -1,5 +1,13 @@
-
-#    Copyright (c) 2008-2009 Dominique Dumont.
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
+#    Copyright (c) 2008-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUi.
 #
@@ -18,18 +26,20 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 package Config::Model::Tk::AnyViewer ;
+BEGIN {
+  $Config::Model::Tk::AnyViewer::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 
 use Tk::Photo ;
 use Tk::ROText;
+use Tk::Dialog ;
 use Config::Model::TkUI ;
 
 use vars qw/$icon_path/ ;
-
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
@@ -60,13 +70,15 @@ sub add_header {
 
     my $label = "$type: ";
     $label .= $item->location || "Class $class" ;
-    my $f = $cw -> Frame -> pack (@fx);
+    my $f = $cw -> Frame ;
 
     $f -> Label (-image => $img{lc($type)} , -anchor => 'w') 
       -> pack (-side => 'left');
 
     $f -> Label ( -text => $label, -anchor => 'e' )
        -> pack  (-side => 'left', @fx);
+
+    return $f ;
 }
 
 my @top_frame_args = qw/-relief raised -borderwidth 4/ ;
@@ -74,34 +86,38 @@ my @low_frame_args = qw/-relief sunken -borderwidth 1/ ;
 my $padx = 20 ;
 my $text_font = [qw/-family Arial -weight normal/] ;
 
-sub add_info_frame {
-    my $cw = shift;
-    my @items = ( "Config class: ". $cw->{config_class_name}, @_ );
+sub add_info_button {
+    my $cw = shift ;
+    my $frame = shift || $cw ;
 
-    my $frame = $cw->Frame()->pack(@fx) ;
-    $frame -> Label(-text => 'Info', -anchor => 'w' ) ->pack(qw/-fill x/) ;
+    my ($elt_name,@items) = $cw->get_info ;
 
-    my $i_frame = $frame->Frame(
-				-padx => $padx 
-			       )->pack(@fx) ;
-    map { $i_frame -> Label(-text => $_, 
-			    -anchor => 'w',  
-			    -font => $text_font ,
-			   ) ->pack(@fx)  ;
-	} @items;
+    my $title = "Info on ". $cw->{config_class_name};
+    $title .= ':'.$elt_name if $elt_name;
+
+    my $dialog = $cw->Dialog (
+			      -title => $title,
+			      -text => join("\n",$title,@items),
+			      -font => $text_font ,
+			     );
+    my $button = $frame 
+      -> Button(-text => "info ...",
+		-command => sub {$dialog -> Show; }
+	       ) ;
+    return $button ; # to be packed by caller
 }
 
 
-# returns the help widget (Label or ROText)
+# returns the help widget (Label or ROText) which must be packed by caller
 sub add_help {
     my $cw = shift ;
     my $help_label = shift ;
     my $help = shift || '' ;
     my $force_text_widget = shift || 0;
 
-    return undef unless $force_text_widget or $help;
+    my $help_frame = $cw-> Frame();
 
-    my $help_frame = $cw-> Frame()->pack(@fbe1);
+    return $help_frame unless $force_text_widget or $help;
 
     $help_frame ->Label(
 			 -text => $help_label, 
@@ -135,14 +151,27 @@ sub add_help {
     return $widget ;
 }
 
-sub add_summary_and_description {
+sub add_summary {
     my ($cw, $elt_obj) = @_ ;
 
     my $p    = $elt_obj->parent ;
     my $name = $elt_obj->element_name ;
-    foreach my $topic (qw/summary description/) {
-	$cw->add_help( ucfirst($topic), $p->get_help($topic => $name)) ;
-    }
+    $cw->add_help( Summary => $p->get_help(summary => $name)) ;
+}
+
+sub add_description {
+    my ($cw, $elt_obj) = @_ ;
+
+    my $p    = $elt_obj->parent ;
+    my $name = $elt_obj->element_name ;
+    $cw->add_help( Description => $p->get_help(description => $name)) ;
+}
+
+# returns a widget that must be packed
+sub add_annotation {
+    my ($cw, $obj) = @_ ;
+
+    $cw->add_help('Note', $obj->annotation) ;
 }
 
 sub add_editor_button {
@@ -152,7 +181,7 @@ sub add_editor_button {
 	$cw->parent->parent->parent->parent
 	  -> create_element_widget( edit => $path) ;
 	} ;
-    $cw->Button(-text => 'Edit ...', -command => $sub)-> pack ;
+    $cw->Button(-text => 'Edit ...', -command => $sub) ;
 }
 
 # do nothing by default 

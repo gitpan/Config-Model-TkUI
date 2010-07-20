@@ -1,29 +1,22 @@
-
-#    Copyright (c) 2008-2009 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUI.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::LeafEditor ;
+BEGIN {
+  $Config::Model::Tk::LeafEditor::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 use Log::Log4perl;
+use Config::Model::Tk::NoteEditor ;
 
 use base qw/Config::Model::Tk::LeafViewer/;
 
@@ -57,7 +50,7 @@ sub Populate {
     my $vt = $leaf -> value_type ;
     $logger->info("Creating leaf editor for value_type $vt");
 
-    $cw->add_header(Edit => $leaf) ;
+    $cw->add_header(Edit => $leaf)->pack(@fx) ;
 
     $cw->{value} = $leaf->fetch ;
     my $vref = \$cw->{value};
@@ -117,9 +110,11 @@ sub Populate {
 
     $inst->pop_no_value_check ;
 
-    $cw->add_info() ;
-    $cw->add_summary_and_description($leaf) ;
-    $cw->{value_help_widget} = $cw->add_help(value => '',1);
+    $cw->ConfigModelNoteEditor( -object => $leaf )->pack;
+    $cw->add_info_button()->pack( @fx,qw/-anchor n/) ;
+    $cw->add_summary($leaf)->pack(@fx) ;
+    $cw->add_description($leaf)->pack(@fx) ;
+    $cw->{value_help_widget} = $cw->add_help(value => '',1)->pack(@fx);
     $cw->set_value_help ;
 
     $cw->ConfigSpecs(

@@ -1,6 +1,18 @@
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI ;
+BEGIN {
+  $Config::Model::TkUI::VERSION = '1.307';
+}
 
 use strict;
 use warnings ;
@@ -37,8 +49,6 @@ use Config::Model::Tk::NodeViewer ;
 use Config::Model::Tk::NodeEditor ;
 
 use Config::Model::Tk::Wizard ;
-
-our $VERSION = '1.306' ;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -179,20 +189,20 @@ sub Populate {
     $cw->reload ;
 
     # add frame on the right for entry and help
-    my $eh_frame = $bottom_frame -> Frame -> pack (qw/-fill both -expand 1 -side left/) ;
-    $cw->{eh_frame} = $eh_frame ;
+    my $eh_frame = $bottom_frame -> Frame 
+      -> pack (qw/-fill both -expand 1 -side right/) ;
 
     # add entry frame, filled by call-back
     # should be a composite widget
-    $cw->{e_frame} = $eh_frame -> Frame 
+    my $e_frame = $eh_frame -> Frame 
       -> pack (qw/-side top -fill both -expand 1/) ;
-    $cw->{e_frame} ->Label(#-text => "placeholder",
-			   -image => $tool_img,
-			   -width => 400, # width in pixel for image
-			  ) -> pack(-side => 'top') ;
-    $cw->{e_frame} ->Button(-text => "Run Wizard !",
-			    -command => sub { $cw->wizard}
-			  ) -> pack(-side => 'bottom') ;
+    $e_frame -> Label( #-text => "placeholder",
+		      -image => $tool_img,
+		      -width => 400, # width in pixel for image
+		     ) -> pack(-side => 'top') ;
+    $e_frame -> Button(-text => "Run Wizard !",
+		       -command => sub { $cw->wizard}
+		      ) -> pack(-side => 'bottom') ;
 
     # bind button3 as double-button-1 does not work
     my $b3_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
@@ -220,20 +230,32 @@ sub Populate {
        #-background => ['DESCENDANTS', 'background', 'Background', $background],
        #-selectbackground => [$hlist, 'selectBackground', 'SelectBackground', 
        #                      $selectbackground],
-       -width  => [$tree, undef, undef, 60],
-       -height => [$tree, undef, undef, 20],
+       -tree_width  => ['METHOD', undef, undef, 80],
+       -tree_height => ['METHOD', undef, undef, 30],
+       -width   => [ $eh_frame , qw/width Width 1280/],
+       -height  => [ $eh_frame, qw/height Height 1024/],
        -selectmode => [ $tree, 'selectMode' ,'SelectMode', 'single' ], #single',
        #-oldcursor => [$hlist, undef, undef, undef],
        DEFAULT => [$tree]
       ) ;
 
-    $cw->Advertise(tree => $tree,
-		   menubar => $menubar,
-		   ed_frame => $cw->{e_frame} ,
-		  );
+    $cw->Advertise( tree    => $tree );
+    $cw->Advertise( menubar => $menubar );
+    $cw->Advertise( right_frame => $eh_frame );
+    $cw->Advertise( ed_frame => $e_frame );
 
+    $cw->Delegates ;
 }
 
+sub tree_width {
+    my ($cw,$value) = @_;
+    $cw->Subwidget('tree')->configure(-width => $value ) ;
+}
+
+sub tree_height {
+    my ($cw,$value) = @_;
+    $cw->Subwidget('tree')->configure(-height => $value ) ;
+}
 
 my $parser = Pod::POM->new();
 
@@ -613,7 +635,8 @@ sub disp_hash {
 
 	if ($tkt->infoExists($newpath) ) {
 	    my $previous_data = $tkt->info(data => $newpath);
-	    my $previous_elt  = $previous_data->[1] ;
+	    # $previous_data is an object (or an empty string to avoid warnings)
+	    my $previous_elt  = $previous_data->[1] || '';
 	    $eltmode = $tkt->getmode($newpath); # will reuse mode below
 	    $logger->trace("disp_hash reuse $newpath mode $eltmode cargo_type $elt_type"
 			   ." obj $previous_elt" );
@@ -661,7 +684,7 @@ sub setmode {
 
     $logger->trace("$type: elt_loc '$elt_loc', opening $opening "
 		   ."eltmode $eltmode force_open $force_open "
-		   . ($fdp ? "on $fdp" : '' ) 
+		   . ($fdp ? "on $fdp" : '' ) . "force_match $force_match"
 		  ) ;
 
     if ($eltmode ne 'open' or $force_open or $opening ) {
@@ -841,17 +864,18 @@ sub create_element_widget {
     my $type = $obj -> get_type ;
     $logger->trace( "item $loc to $mode (type $type)" );
 
+    my $e_frame = $cw->Subwidget('ed_frame') ;
+
     # cleanup existing widget contained in this frame
     delete $cw->{editor} ;
-    map { $_ ->destroy if Tk::Exists($_) } $cw->{e_frame}->children ;
+    map { $_ ->destroy if Tk::Exists($_) } $e_frame->children ;
 
-    my $frame = $cw->{e_frame} ;
 
     my $widget = $widget_table{$mode}{$type} 
       || die "Cannot find $mode widget for type $type";
     my @store = $mode eq 'edit' ? (-store_cb => sub {$cw->reload(@_)} ) : () ;
-    $cw->{editor} = $frame -> $widget(-item => $obj, -path => $tree_path,
-				      @store ) ;
+    $cw->{editor} = $e_frame -> $widget(-item => $obj, -path => $tree_path,
+					@store ) ;
     $cw->{editor}-> pack(-expand => 1, -fill => 'both') ;
     return $cw->{editor} ;
 }
@@ -947,13 +971,20 @@ sub wizard {
     my $cw = shift ;
     my $tree = $cw->{tktree} ;
 
+    # when wizard is run, there's no need to update editor window in 
+    # main widget
     my $wiz = $cw->ConfigModelWizard 
       (
-       -root => $cw->{root}, 
-       -store_cb => sub{ $cw->force_element_display(@_)},
-       -show_cb => sub{ $cw->force_element_display(@_)},
+	-root     => $cw->{root}, 
+	-store_cb => sub{ $cw->force_element_display(@_)},
+	-end_cb   => sub{ $cw->deiconify; $cw->raise ; },
+       # -show_cb => sub{ $cw->force_element_display(@_)},
       ) ;
 
+    # hide main window while wizard is running
+    # end_cb callback will raise the main window
+    $cw->withdraw ;
+    
     $wiz->start_wizard($cw->{experience}) ;
 }
 
@@ -964,6 +995,10 @@ __END__
 =head1 NAME
 
 Config::Model::TkUI - Tk GUI to edit config data through Config::Model
+
+=head1 VERSION
+
+version 1.307
 
 =head1 SYNOPSIS
 
@@ -1136,6 +1171,3 @@ http://config-model.wiki.sourceforge.net/
 Config::Model mailing lists on http://sourceforge.net/mail/?group_id=155650
 
 =back
-
-
-

@@ -1,26 +1,18 @@
-
-#    Copyright (c) 2009-2010 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUi.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::NodeEditor ;
+BEGIN {
+  $Config::Model::Tk::NodeEditor::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 
@@ -55,7 +47,7 @@ sub Populate {
     $cw->{path} = delete $args->{-path} ;
     $cw->{store_cb} = delete $args->{-store_cb} || die __PACKAGE__,"no -store_cb" ;
 
-    $cw->add_header(Edit => $node) ;
+    $cw->add_header(Edit => $node)->pack(@fx) ;
 
     $cw -> Label(-text => $node->composite_name.' node elements') -> pack() ;
 
@@ -68,13 +60,14 @@ sub Populate {
     #require Tk::Adjuster;
     #$cw -> Adjuster()->pack(-fill => 'x' , -side => 'top') ;
 
-    $cw->add_info($cw) ;
+    $cw->add_info_button()->pack(@fxe1, qw/-anchor n/) ;
 
     if ($node->parent) {
-	$cw->add_summary_and_description($node) ;
+	$cw->add_summary($node)->pack(@fx) ;
+	$cw->add_description($node)->pack(@fx) ;
     }
     else {
-	$cw->add_help(class   => $node->get_help) ;
+	$cw->add_help(class   => $node->get_help)->pack(@fx) ;
     }
     $cw->SUPER::Populate($args) ;
 }
@@ -170,9 +163,8 @@ sub fill_pane {
     map {my $w = delete $cw->{elt_widgets}{$_};$w->destroy } keys %old_elt ;
 }
 
-sub add_info {
+sub get_info {
     my $cw = shift ;
-    my $info_frame = shift ;
 
     my $node = $cw->{node} ;
 
@@ -180,7 +172,7 @@ sub add_info {
 		 'class name : '.$node->config_class_name ,
 		);
 
-    $cw->add_info_frame(@items) ;
+    return $node->element_name,@items ;
 }
 
 

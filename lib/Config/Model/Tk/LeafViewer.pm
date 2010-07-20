@@ -1,26 +1,18 @@
-
-#    Copyright (c) 2008 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUI.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::LeafViewer ;
+BEGIN {
+  $Config::Model::Tk::LeafViewer::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 use Log::Log4perl ;
@@ -59,7 +51,7 @@ sub Populate {
 
     $inst->pop_no_value_check ;
 
-    $cw->add_header(View => $leaf) ;
+    $cw->add_header(View => $leaf)->pack(@fx) ;
 
     my @pack_args = @fx ;
     @pack_args = @fbe1 if $vt eq 'string' ;
@@ -85,10 +77,12 @@ sub Populate {
 	    -> pack(@fxe1, -side => 'left');
     }
 
-    $cw->add_info() ;
-    $cw->add_summary_and_description($leaf) ;
-    $cw->add_help('value help'   => $leaf->get_help($cw->{value})) ;
-    $cw->add_editor_button($path) ;
+    $cw->add_annotation($leaf)->pack(@fx);
+    $cw->add_summary($leaf)->pack(@fx) ;
+    $cw->add_description($leaf)->pack(@fx) ;
+    $cw->add_help('value help'   => $leaf->get_help($cw->{value}))->pack(@fx) ;
+    $cw->add_info_button()       -> pack(@fxe1, -side => 'left' , -anchor => 'n') ;
+    $cw->add_editor_button($path)-> pack(@fxe1, -side => 'right', -anchor => 'n') ;
 
     $cw->ConfigSpecs(
 		     #-fill   => [ qw/SELF fill Fill both/],
@@ -101,7 +95,7 @@ sub Populate {
     $cw->SUPER::Populate($args) ;
 }
 
-sub add_info {
+sub get_info {
     my $cw = shift ;
 
     my $leaf = $cw->{leaf} ;
@@ -127,7 +121,6 @@ sub add_info {
 	push @items, "computed reference to: " . $leaf->computed_refer_to ;
     }
 
-
     my $m = $leaf->mandatory ;
     push @items, "is mandatory: ".($m ? 'yes':'no') if defined $m;
 
@@ -136,7 +129,7 @@ sub add_info {
 	push @items, "$what value: $v" if defined $v;
     }
 
-    $cw->add_info_frame(@items) ;
+    return $leaf->element_name, @items;
 }
 
 

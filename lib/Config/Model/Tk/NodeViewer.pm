@@ -1,26 +1,18 @@
-
-#    Copyright (c) 2008-2009 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUi.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::NodeViewer ;
+BEGIN {
+  $Config::Model::Tk::NodeViewer::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 
@@ -32,6 +24,7 @@ Construct Tk::Widget 'ConfigModelNodeViewer';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill    x / ;
 
 sub ClassInit {
     my ($cw, $args) = @_;
@@ -47,7 +40,7 @@ sub Populate {
       || die "NodeViewer: no -item, got ",keys %$args;
     my $path = delete $args->{-path} ;
 
-    $cw->add_header(View => $node) ;
+    $cw->add_header(View => $node)->pack(@fx) ;
 
     my $inst = $node->instance ;
 
@@ -72,16 +65,18 @@ sub Populate {
     #$cw->{adjust} = $cw -> Adjuster();
     #$cw->{adjust}->packAfter($hl, -side => 'top') ;
 
-    $cw->add_info($cw) ;
+    $cw->add_annotation($node)->pack(@fx);
 
     if ($node->parent) {
-	$cw->add_summary_and_description($node) ;
+	$cw->add_summary($node)->pack(@fx) ;
+	$cw->add_description($node)->pack(@fx) ;
     }
     else {
-	$cw->add_help(class   => $node->get_help) ;
+	$cw->add_help(class   => $node->get_help)->pack(@fx) ;
     }
 
-    $cw->add_editor_button($path) ;
+    $cw->add_info_button()->pack(@fxe1, -side => 'left') ;
+    $cw->add_editor_button($path)-> pack (@fxe1, -side => 'right');
 
     $cw->SUPER::Populate($args) ;
 }
@@ -140,9 +135,8 @@ sub reload {
     map {$hl->delete(entry => $_); } keys %old_elt ;
 }
 
-sub add_info {
+sub get_info {
     my $cw = shift ;
-    my $info_frame = shift ;
 
     my $node = $cw->{node} ;
 
@@ -150,7 +144,7 @@ sub add_info {
 		 'class name : '.$node->config_class_name ,
 		);
 
-    $cw->add_info_frame(@items) ;
+    return $node->element_name,@items ;
 }
 
 

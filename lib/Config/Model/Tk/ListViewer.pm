@@ -1,26 +1,18 @@
-
-#    Copyright (c) 2008 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUI.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::ListViewer ;
+BEGIN {
+  $Config::Model::Tk::ListViewer::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 
@@ -32,6 +24,7 @@ Construct Tk::Widget 'ConfigModelListViewer';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill    x / ;
 
 sub ClassInit {
     my ($cw, $args) = @_;
@@ -48,11 +41,11 @@ sub Populate {
     my $path = delete $args->{-path} 
       || die "ListViewer: no -path, got ",keys %$args;
 
-    $cw->add_header(View => $list) ;
+    $cw->add_header(View => $list)->pack(@fx) ;
 
     my $inst = $list->instance ;
 
-    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 2/)->pack(@fxe1) ;
+    my $elt_frame = $cw->Frame(qw/-relief raised -borderwidth 2/)->pack(@fbe1) ;
     my $str =  $list->element_name.' '.$list->get_type .' elements' ;
     $elt_frame -> Label(-text => $str) -> pack() ;
 
@@ -67,15 +60,18 @@ sub Populate {
 	$rt->insert('end', $line."\n" ) ;
     }
 
-    $cw->add_info($cw) ;
-    $cw->add_summary_and_description($list) ;
-    $cw->add_editor_button($path) ;
+    $cw->add_annotation($list)->pack(@fx) ;
+    $cw->add_summary($list)->pack(@fx) ;
+    $cw->add_description($list)->pack(@fx) ;
+
+    $cw->add_info_button()-> pack(-side => 'left',@fxe1) ;
+    $cw->add_editor_button($path)-> pack(-side => 'right', @fxe1) ;
 
     $cw->SUPER::Populate($args) ;
 }
 
 
-sub add_info {
+sub get_info {
     my $cw = shift ;
     my $info_frame = shift ;
 
@@ -101,7 +97,7 @@ sub add_info {
 	push @items, "$str: $v" if defined $v;
     }
 
-    $cw->add_info_frame(@items) ;
+    return $list->element_name, @items ;
 }
 
 

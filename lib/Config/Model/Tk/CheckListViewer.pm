@@ -1,26 +1,18 @@
-
-#    Copyright (c) 2008-2009 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUI.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::CheckListViewer ;
+BEGIN {
+  $Config::Model::Tk::CheckListViewer::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 
@@ -32,6 +24,8 @@ use Tk::ROText ;
 Construct Tk::Widget 'ConfigModelCheckListViewer';
 
 my @fbe1 = qw/-fill both -expand 1/ ;
+my @fxe1 = qw/-fill x    -expand 1/ ;
+my @fx   = qw/-fill x/ ;
 
 sub ClassInit {
     my ($cw, $args) = @_;
@@ -50,17 +44,13 @@ sub Populate {
 
     my $inst = $leaf->instance ;
 
-    $cw->add_header(View => $leaf) ;
+    $cw->add_header(View => $leaf)->pack(@fx) ;
 
     my $rt = $cw->Scrolled ( 'ROText',
 			     -scrollbars => 'osoe',
-			     -height => 10,
+			     -height => 6,
 			   ) ->pack(@fbe1) ;
     $rt->tagConfigure('in',-background => 'black', -foreground => 'white') ;
-
-    $cw->add_info() ;
-    $cw->add_summary_and_description($leaf) ;
-    $cw->{value_help_widget} = $cw->add_help(value => '',1);
 
     my %h = $leaf->get_checked_list_as_hash ;
     foreach my $c ($leaf->get_choice) {
@@ -68,9 +58,16 @@ sub Populate {
 	$rt->insert('end', $c."\n" , $tag) ;
     }
 
+    $cw->add_annotation($leaf)->pack(@fx) ;
+    $cw->add_summary($leaf)->pack(@fx) ;
+
+    $cw->{value_help_widget} = $cw->add_help(value => '',1)->pack(@fx);
     $cw->set_value_help($leaf->get_checked_list);
 
-    $cw->add_editor_button($path) ;
+    $cw->add_description($leaf)->pack(@fx) ;
+
+    $cw->add_info_button()->pack(@fxe1, -side => 'left') ;
+    $cw->add_editor_button($path)-> pack(@fxe1, -side => 'right') ;
 
     $cw->SUPER::Populate($args) ;
 }
@@ -100,7 +97,7 @@ sub set_value_help {
      }
  }
 
-sub add_info {
+sub get_info {
     my $cw = shift ;
 
     my @items = () ;
@@ -108,7 +105,8 @@ sub add_info {
     if (defined $leaf->refer_to) {
 	push @items, "refer_to: ".$leaf->refer_to ;
     }
-    $cw->add_info_frame(@items) if @items ;
+    push @items, "ordered: ". ($leaf->ordered ? 'yes' : 'no');
+    return $leaf->element_name, @items ;
 }
 
 1;

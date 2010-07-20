@@ -1,26 +1,18 @@
-
-#    Copyright (c) 2008 Dominique Dumont.
-#
-#    This file is part of Config-Model-TkUI.
-#
-#    Config-Model is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Lesser Public License as
-#    published by the Free Software Foundation; either version 2.1 of
-#    the License, or (at your option) any later version.
-#
-#    Config-Model is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Lesser Public License for more details.
-#
-#    You should have received a copy of the GNU Lesser Public License
-#    along with Config-Model; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-
+# 
+# This file is part of Config-Model-TkUI
+# 
+# This software is Copyright (c) 2010 by Dominique Dumont.
+# 
+# This is free software, licensed under:
+# 
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+# 
 package Config::Model::Tk::CheckListEditor ;
+BEGIN {
+  $Config::Model::Tk::CheckListEditor::VERSION = '1.307';
+}
 
 use strict;
-our $VERSION="1.305";
 use warnings ;
 use Carp ;
 
@@ -29,7 +21,7 @@ use vars qw/$icon_path/ ;
 use subs qw/menu_struct/ ;
 
 use Tk::NoteBook;
-
+use Config::Model::Tk::NoteEditor ;
 
 Construct Tk::Widget 'ConfigModelCheckListEditor';
 
@@ -40,6 +32,7 @@ my $down_img;
 
 my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill    x -expand 1/ ;
+my @fx   = qw/-fill    x / ;
 
 sub ClassInit {
     my ($cw, $args) = @_;
@@ -58,7 +51,7 @@ sub Populate {
 
     my $inst = $leaf->instance ;
 
-    $cw->add_header(Edit => $leaf) ;
+    $cw->add_header(Edit => $leaf)->pack(@fx) ;
 
     my $nb = $cw->Component('NoteBook','notebook')->pack(@fbe1);
 
@@ -78,7 +71,7 @@ sub Populate {
 
     $lb = $ed_frame->Scrolled ( qw/Listbox -selectmode multiple/,
 				   -scrollbars => 'osoe',
-				   -height => 10,
+				   -height => 5,
 				 ) ->pack(@fbe1) ;
     $lb->insert('end',@choice) ;
 
@@ -103,8 +96,11 @@ sub Populate {
 			-command => sub { $cw->store ( &$get_selected )},
 		      ) -> pack(-side => 'left') ;
 
-    $cw->add_summary_and_description($leaf) ;
-    $cw->{value_help_widget} = $cw->add_help(value => '',1);
+    $cw->ConfigModelNoteEditor( -object => $leaf )->pack(@fbe1) ;
+    $cw->add_summary($leaf)->pack(@fx) ;
+    $cw->add_description($leaf)->pack(@fx) ;
+    $cw->{value_help_widget} = $cw->add_help(value => '',1)->pack(@fx);
+    $cw->add_info_button()->pack(@fxe1) ;
     $b_sub->() ;
 
     # Add a second page to edit the list order for ordered check list
