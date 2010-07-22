@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::NodeViewer ;
 BEGIN {
-  $Config::Model::Tk::NodeViewer::VERSION = '1.307';
+  $Config::Model::Tk::NodeViewer::VERSION = '1.308';
 }
 
 use strict;

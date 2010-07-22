@@ -26,10 +26,6 @@ lib/Config/Model/Tk/icons/up.png
 lib/Config/Model/Tk/icons/viewmag.png
 lib/Config/Model/Tk/icons/wizard.png
 lib/Config/Model/TkUI.pm
-libconfig-model-tkui-perl_1.307-1.dsc
-libconfig-model-tkui-perl_1.307-1.tar.gz
-libconfig-model-tkui-perl_1.307-1_all.deb
-libconfig-model-tkui-perl_1.307-1_amd64.changes
 t/big_model.pm
 t/config-model-ui.t
 t/config-model-wizard.t

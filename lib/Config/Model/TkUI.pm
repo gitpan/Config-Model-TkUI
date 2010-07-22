@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 BEGIN {
-  $Config::Model::TkUI::VERSION = '1.307';
+  $Config::Model::TkUI::VERSION = '1.308';
 }
 
 use strict;
@@ -998,7 +998,7 @@ Config::Model::TkUI - Tk GUI to edit config data through Config::Model
 
 =head1 VERSION
 
-version 1.307
+version 1.308
 
 =head1 SYNOPSIS
 
