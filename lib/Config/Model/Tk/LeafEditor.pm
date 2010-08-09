@@ -1,15 +1,15 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
+#
 # This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 package Config::Model::Tk::LeafEditor ;
 BEGIN {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.308';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.309';
 }
 
 use strict;
@@ -64,47 +64,47 @@ sub Populate {
     $ed_frame  -> Label(-text => 'Value') -> pack() ;
 
     if ($vt eq 'string') {
-	$cw->{e_widget} = $ed_frame->Scrolled ( 'Text',
-						-height => 5 ,
-						-scrollbars => 'ow',
-					      )
+        $cw->{e_widget} = $ed_frame->Scrolled ( 'Text',
+                                                -height => 5 ,
+                                                -scrollbars => 'ow',
+                                              )
                              ->pack(@fbe1);
-	$cw->{e_widget}
-	  ->tagConfigure(qw/value -lmargin1 2 -lmargin2 2 -rmargin 2/);
-	$cw->reset_value ;
-	my $bframe = $cw->add_buttons($ed_frame) ;
-	$bframe -> Button ( -text => 'Cleanup',
-			    -command => sub { $cw->cleanup},
-			  ) -> pack(-side => 'left') ;
+        $cw->{e_widget}
+          ->tagConfigure(qw/value -lmargin1 2 -lmargin2 2 -rmargin 2/);
+        $cw->reset_value ;
+        my $bframe = $cw->add_buttons($ed_frame) ;
+        $bframe -> Button ( -text => 'Cleanup',
+                            -command => sub { $cw->cleanup},
+                          ) -> pack(-side => 'left') ;
     }
     elsif ($vt eq 'boolean') {
-	$ed_frame->Checkbutton(-text => $leaf->element_name,
-			 -variable => $vref,
-			 -command => sub { $cw->try},
-			)
-	  ->pack();
-	$cw->add_buttons($ed_frame) ;
+        $ed_frame->Checkbutton(-text => $leaf->element_name,
+                         -variable => $vref,
+                         -command => sub { $cw->try},
+                        )
+          ->pack();
+        $cw->add_buttons($ed_frame) ;
     }
     elsif ($vt eq 'uniline' or $vt eq 'integer') {
-	$ed_frame -> Entry(-textvariable => $vref)
-	    -> pack(@fx);
-	$cw->add_buttons($ed_frame) ;
+        $ed_frame -> Entry(-textvariable => $vref)
+            -> pack(@fx);
+        $cw->add_buttons($ed_frame) ;
     }
     elsif ($vt eq 'enum' or $vt eq 'reference') {
-	my $lb = $ed_frame->Scrolled ( 'Listbox',
-				       -height => 5,
-				       -scrollbars => 'osow',
-				       #-listvariable => $vref,
-				       #-selectmode => 'single',
-				     ) ->pack(@fbe1) ;
-	my @choice = $leaf->get_choice ;
-	$lb->insert('end',$leaf->get_choice) ;
-	my $idx = 0;
-	if (defined $$vref) {
-	  map { $lb->selectionSet($idx) if $_ eq $$vref; $idx ++}  @choice;
-	}
-	$lb->bind('<Button-1>',sub {$cw->try($lb->get($lb->curselection()))});
-	$cw->add_buttons($ed_frame) ;
+        my $lb = $ed_frame->Scrolled ( 'Listbox',
+                                       -height => 5,
+                                       -scrollbars => 'osow',
+                                       #-listvariable => $vref,
+                                       #-selectmode => 'single',
+                                     ) ->pack(@fbe1) ;
+        my @choice = $leaf->get_choice ;
+        $lb->insert('end',$leaf->get_choice) ;
+        my $idx = 0;
+        if (defined $$vref) {
+          map { $lb->selectionSet($idx) if $_ eq $$vref; $idx ++}  @choice;
+        }
+        $lb->bind('<Button-1>',sub {$cw->try($lb->get($lb->curselection()))});
+        $cw->add_buttons($ed_frame) ;
 
     }
 
@@ -114,15 +114,17 @@ sub Populate {
     $cw->add_info_button()->pack( @fx,qw/-anchor n/) ;
     $cw->add_summary($leaf)->pack(@fx) ;
     $cw->add_description($leaf)->pack(@fx) ;
-    $cw->{value_help_widget} = $cw->add_help(value => '',1)->pack(@fx);
+    my ($help_frame, $help_widget) = $cw->add_help(value => '',1);
+    $help_frame->pack(@fx);
+    $cw->{value_help_widget} = $help_widget ; 
     $cw->set_value_help ;
 
     $cw->ConfigSpecs(
-		     #-fill   => [ qw/SELF fill Fill both/],
-		     #-expand => [ qw/SELF expand Expand 1/],
-		     -relief => [qw/SELF relief Relief groove/ ],
-		     -borderwidth => [qw/SELF borderwidth Borderwidth 2/] ,
-		     DEFAULT => [ qw/SELF/ ],
+                     #-fill   => [ qw/SELF fill Fill both/],
+                     #-expand => [ qw/SELF expand Expand 1/],
+                     -relief => [qw/SELF relief Relief groove/ ],
+                     -borderwidth => [qw/SELF borderwidth Borderwidth 2/] ,
+                     DEFAULT => [ qw/SELF/ ],
            );
 
     # don't call directly SUPER::Populate as it's LeafViewer's populate
@@ -139,9 +141,9 @@ sub cleanup {
     $text =~ s/\s+/ /g;
 
     if ($selected) {
-	$text_widget -> Insert ($text) ;
+        $text_widget -> Insert ($text) ;
     } else {
-	$text_widget -> Contents($text) ;
+        $text_widget -> Contents($text) ;
     }
 }
 
@@ -149,14 +151,14 @@ sub add_buttons {
     my ($cw,$frame) = @_ ;
     my $bframe = $frame->Frame->pack() ;
     $bframe -> Button ( -text => 'Reset',
-			-command => sub { $cw->reset_value ; },
-		      ) -> pack(-side => 'left') ;
+                        -command => sub { $cw->reset_value ; },
+                      ) -> pack(-side => 'left') ;
     $bframe -> Button ( -text => 'Delete',
-			-command => sub { $cw->delete},
-		      ) -> pack(-side => 'left') ;
+                        -command => sub { $cw->delete},
+                      ) -> pack(-side => 'left') ;
     $bframe -> Button ( -text => 'Store',
-			-command => sub { $cw->store},
-		      ) -> pack(-side => 'right') ;
+                        -command => sub { $cw->store},
+                      ) -> pack(-side => 'right') ;
     return $bframe ;
 }
 
@@ -166,12 +168,12 @@ sub try {
     my $v = shift ;
 
     if (defined $v) {
-	$cw->{value} = $v ;
+        $cw->{value} = $v ;
     }
     else {
-	my $e_w = $cw->{e_widget} ;
-	# tk widget use a reference
-	$v = defined  $e_w ? $e_w->get('1.0','end')
+        my $e_w = $cw->{e_widget} ;
+        # tk widget use a reference
+        $v = defined  $e_w ? $e_w->get('1.0','end')
            :                 $cw->{value} ;
     }
 
@@ -184,16 +186,16 @@ sub try {
     my @errors = $cw->{leaf}->check($v,1) ;
 
     if (@errors ) {
-	$cw -> Dialog ( -title => 'Value error',
-			-text  => join("\n",@errors),
-		      )
+        $cw -> Dialog ( -title => 'Value error',
+                        -text  => join("\n",@errors),
+                      )
             -> Show ;
-	$cw->reset_value ;
-	return ;
+        $cw->reset_value ;
+        return ;
     }
     else {
-	$cw->set_value_help($v) ;
-	return $v ;
+        $cw->set_value_help($v) ;
+        return $v ;
     }
 }
 
@@ -203,15 +205,15 @@ sub delete {
     eval {$cw->{leaf}->store(undef); } ;
 
     if ($@) {
-	$cw -> Dialog ( -title => 'Delete error',
-			-text  => "$@",
-		      )
+        $cw -> Dialog ( -title => 'Delete error',
+                        -text  => "$@",
+                      )
             -> Show ;
     }
     else {
-	# trigger redraw of Tk Tree
-	$cw->reset_value ;
-	$cw->parent->parent->parent->parent->reload(1) ;
+        # trigger redraw of Tk Tree
+        $cw->reset_value ;
+        $cw->parent->parent->parent->parent->reload(1) ;
     }
 }
 
@@ -225,15 +227,15 @@ sub store {
     eval {$cw->{leaf}->store($v); } ;
 
     if ($@) {
-	$cw -> Dialog ( -title => 'Value error',
-			-text  => "$@",
-		      )
+        $cw -> Dialog ( -title => 'Value error',
+                        -text  => "$@",
+                      )
             -> Show ;
-	$cw->reset_value ;
+        $cw->reset_value ;
     }
     else {
-	# trigger redraw of Tk Tree
-	$cw->{store_cb}->($cw->{leaf}) ;
+        # trigger redraw of Tk Tree
+        $cw->{store_cb}->($cw->{leaf}) ;
     }
 }
 
@@ -241,10 +243,10 @@ sub set_value_help {
      my $cw = shift ;
      my $v = $cw->{value} ;
      if (defined $v) {
-	 my $value_help = $cw->{leaf}->get_help($v);
-	 my $w = $cw->{value_help_widget};
-	 $w->delete('0.0','end');
-	 $w->insert('end',$value_help) if defined $value_help ;
+         my $value_help = $cw->{leaf}->get_help($v);
+         my $w = $cw->{value_help_widget};
+         $w->delete('0.0','end');
+         $w->insert('end',$value_help) if defined $value_help ;
      }
  }
 
@@ -252,8 +254,8 @@ sub reset_value {
     my $cw = shift ;
     $cw->{value} = $cw->{leaf}->fetch ;
     if (defined $cw->{e_widget}) {
-	$cw->{e_widget}->delete('1.0','end') ;
-	$cw->{e_widget}->insert('end',$cw->{value},'value') ;
+        $cw->{e_widget}->delete('1.0','end') ;
+        $cw->{e_widget}->insert('end',$cw->{value},'value') ;
     }
     $cw->set_value_help if defined $cw->{value_help_widget};
 }

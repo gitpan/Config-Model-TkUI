@@ -1,15 +1,15 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
+#
 # This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 package Config::Model::Tk::LeafViewer ;
 BEGIN {
-  $Config::Model::Tk::LeafViewer::VERSION = '1.308';
+  $Config::Model::Tk::LeafViewer::VERSION = '1.309';
 }
 
 use strict;

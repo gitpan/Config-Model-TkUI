@@ -3,6 +3,7 @@ ChangeLog
 LICENSE
 MANIFEST
 MANIFEST.SKIP
+META.yml
 README
 examples/model.pl
 lib/Config/Model/Tk/AnyViewer.pm
