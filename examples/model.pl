@@ -1,13 +1,13 @@
 #!/usr/bin/perl
-#
+# 
 # This file is part of Config-Model-TkUI
-#
+# 
 # This software is Copyright (c) 2010 by Dominique Dumont.
-#
+# 
 # This is free software, licensed under:
-#
+# 
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-#
+# 
 
 # example contributed by 
 # (c) 2009 Alexander Becker <asb_ehb at yahoo.de> 

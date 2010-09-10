@@ -1,12 +1,12 @@
-#
+# 
 # This file is part of Config-Model-TkUI
-#
+# 
 # This software is Copyright (c) 2010 by Dominique Dumont.
-#
+# 
 # This is free software, licensed under:
-#
+# 
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-#
+# 
 #    Copyright (c) 2008-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUi.
@@ -27,7 +27,7 @@
 
 package Config::Model::Tk::AnyViewer ;
 BEGIN {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.309';
+  $Config::Model::Tk::AnyViewer::VERSION = '1.310';
 }
 
 use strict;

@@ -1,15 +1,15 @@
-#
+# 
 # This file is part of Config-Model-TkUI
-#
+# 
 # This software is Copyright (c) 2010 by Dominique Dumont.
-#
+# 
 # This is free software, licensed under:
-#
+# 
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-#
+# 
 package Config::Model::Tk::HashEditor ;
 BEGIN {
-  $Config::Model::Tk::HashEditor::VERSION = '1.309';
+  $Config::Model::Tk::HashEditor::VERSION = '1.310';
 }
 
 use strict;
@@ -119,7 +119,7 @@ sub Populate {
 
     # bind both entries to update correctly the state of all buttons
     my $bound_sub = sub { 
-	$cw->update_state(entry => $item , tklist => $tklist->curselection) 
+	$cw->update_state(entry => $item , tklist => $tklist->curselection || 0) 
     };
     $entry -> bind( '<KeyPress>'       , $bound_sub );
     $tklist-> bind( '<<ListboxSelect>>', $bound_sub );
