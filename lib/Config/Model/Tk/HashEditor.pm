@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::HashEditor ;
 BEGIN {
-  $Config::Model::Tk::HashEditor::VERSION = '1.310';
+  $Config::Model::Tk::HashEditor::VERSION = '1.311';
 }
 
 use strict;
@@ -104,8 +104,15 @@ sub Populate {
     $label_keep_frame -> Label (-text => 'Item:')
       -> pack(-side => 'left', -anchor => 'w') ;
 
-    my $keep_b = $label_keep_frame -> Checkbutton (-variable => \$keep, 
-					    -text => 'keep')
+    # copy selected entry text into item (textvariable) when $keep is set
+    my $keep_cb = sub { 
+	my $sel = $tklist->curselection;
+	$item = $keep && $sel ? $tklist->get($sel) : '' ;
+    };
+	
+    my $keep_b = $label_keep_frame -> Checkbutton ( -variable => \$keep, 
+						    -command => $keep_cb,
+						    -text => 'keep')
       -> pack  (qw/-side right -anchor e/) ;
     $balloon->attach($keep_b, 
 		     -msg => 'keep entry in widget after add, move or copy');
