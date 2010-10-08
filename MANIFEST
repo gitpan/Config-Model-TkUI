@@ -19,6 +19,7 @@ lib/Config/Model/Tk/NodeEditor.pm
 lib/Config/Model/Tk/NodeViewer.pm
 lib/Config/Model/Tk/NoteEditor.pm
 lib/Config/Model/Tk/Wizard.pm
+lib/Config/Model/Tk/icons/dialog-warning.png
 lib/Config/Model/Tk/icons/down.png
 lib/Config/Model/Tk/icons/next.png
 lib/Config/Model/Tk/icons/stop.png
@@ -32,3 +33,4 @@ t/config-model-ui.t
 t/config-model-wizard.t
 t/pod.t
 t/release-pod-syntax.t
+wr_data/foo/test1.cds

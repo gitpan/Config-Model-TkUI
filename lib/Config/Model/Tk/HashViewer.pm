@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::HashViewer ;
 BEGIN {
-  $Config::Model::Tk::HashViewer::VERSION = '1.312';
+  $Config::Model::Tk::HashViewer::VERSION = '1.313';
 }
 
 use strict;
@@ -59,6 +59,7 @@ sub Populate {
     }
 
     $cw->add_annotation($hash) -> pack(@fx);
+    $cw->add_warning($hash)->pack(@fx) ;
     $cw->add_summary($hash)    -> pack(@fx) ;
     $cw->add_description($hash)-> pack(@fx) ;
 
@@ -84,7 +85,7 @@ sub get_info {
 	push @items, "cargo class: " . $hash->config_class_name ;
     }
 
-    foreach my $what (qw/min_index max_index max_nb/) {
+    foreach my $what (qw/min_index max_index max_nb warn_if_key_match warn_unless_key_match/) {
 	my $v = $hash->$what() ;
 	my $str = $what ;
 	$str =~ s/_/ /g;

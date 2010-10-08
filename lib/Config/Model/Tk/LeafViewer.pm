@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::LeafViewer ;
 BEGIN {
-  $Config::Model::Tk::LeafViewer::VERSION = '1.312';
+  $Config::Model::Tk::LeafViewer::VERSION = '1.313';
 }
 
 use strict;
@@ -80,6 +80,7 @@ sub Populate {
     $cw->add_annotation($leaf)->pack(@fx);
     $cw->add_summary($leaf)->pack(@fx) ;
     $cw->add_description($leaf)->pack(@fx) ;
+    $cw->add_warning($leaf)->pack(@fx) ;
     $cw->add_help('value help'   => $leaf->get_help($cw->{value}))->pack(@fx) ;
     $cw->add_info_button()       -> pack(@fxe1, -side => 'left' , -anchor => 'n') ;
     $cw->add_editor_button($path)-> pack(@fxe1, -side => 'right', -anchor => 'n') ;
@@ -124,7 +125,7 @@ sub get_info {
     my $m = $leaf->mandatory ;
     push @items, "is mandatory: ".($m ? 'yes':'no') if defined $m;
 
-    foreach my $what (qw/min max/) {
+    foreach my $what (qw/min max warn_if_match warn_unless_match warn/) {
 	my $v = $leaf->$what() ;
 	push @items, "$what value: $v" if defined $v;
     }
