@@ -8,9 +8,6 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 # 
 package Config::Model::Tk::LeafEditor ;
-BEGIN {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.314';
-}
 
 use strict;
 use warnings ;

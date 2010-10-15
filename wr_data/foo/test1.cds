@@ -42,7 +42,7 @@ slave_y
   a_string=slave_y_foo
   a_long_string=sylongfoo
   another_string=sy_anotherfoo -
-a_string="toto tata"
+a_string="utf8 smiley ☺"
 a_long_string="a very long string with
 embedded return"
 a_mandatory_string=foo1

@@ -16,11 +16,11 @@ name: Config-Model-TkUI
 recommends:
   Tk::ObjScanner: 0
 requires:
-  Config::Model: 1.211
+  Config::Model: 1.212
   Exception::Class: 0
   Log::Log4perl: 1.11
   Pod::POM: 0
   Tk: 0
   Tk::DirSelect: 0
   Tk::Tree: 0
-version: 1.313
+version: 1.314

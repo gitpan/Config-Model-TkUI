@@ -8,9 +8,6 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 # 
 package Config::Model::Tk::HashViewer ;
-BEGIN {
-  $Config::Model::Tk::HashViewer::VERSION = '1.314';
-}
 
 use strict;
 use warnings ;
