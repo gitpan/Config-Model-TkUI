@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 BEGIN {
-  $Config::Model::TkUI::VERSION = '1.314';
+  $Config::Model::TkUI::VERSION = '1.315';
 }
 
 use strict;
@@ -793,7 +793,7 @@ sub disp_leaf {
     my ($path,$cw,$opening,$fdp_obj) = @$data_ref ;
     $logger->trace( "disp_leaf    path is $path" );
 
-    my $std_v = $leaf_object->fetch('standard') ;
+    my $std_v = $leaf_object->fetch(qw/mode standard check no silent 1/) ;
     my $value = $leaf_object->fetch(check => 'no', silent => 1) ;
     my $tkt = $cw->{tktree} ;
 
