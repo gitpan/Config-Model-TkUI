@@ -38,18 +38,28 @@ my $build = Module::Build->new
    license => 'lgpl',
    dist_abstract => "Tk GUI to edit config data through Config::Model",
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
-   requires => {
-		'Config::Model'    => '1.202',
-		'Exception::Class' => 0,
-		'Tk'               => 0,
-		'Tk::DirSelect'    => 0,
-		'Tk::Tree'         => 0,
-		'Log::Log4perl'    => '1.11', # for TRACE log level
-		'Pod::POM'         => 0,
-	       },
-   recommends => {
-		  'Tk::ObjScanner' => 0, # for TkUI debug menu
-		 },
+
+  'build_requires' => {
+    'Module::Build' => '0.3601',
+    'Test::More' => '0',
+    'Test::Warn' => '0.11'
+  },
+  'configure_requires' => {
+    'Module::Build' => '0.3601'
+  },
+  'recommends' => {
+    'Tk::ObjScanner' => '0'
+  },
+  'requires' => {
+    'Config::Model' => '1.212',
+    'Exception::Class' => '0',
+    'Log::Log4perl' => '1.11',
+    'Pod::POM' => '0',
+    'Tk' => '0',
+    'Tk::DirSelect' => '0',
+    'Tk::Tree' => '0'
+  },
+
    add_to_cleanup => [qw/stderr.log wr_data/] ,
   );
 

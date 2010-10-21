@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 BEGIN {
-  $Config::Model::TkUI::VERSION = '1.315';
+  $Config::Model::TkUI::VERSION = '1.316';
 }
 
 use strict;

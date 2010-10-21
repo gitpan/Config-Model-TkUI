@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::ListEditor ;
 BEGIN {
-  $Config::Model::Tk::ListEditor::VERSION = '1.315';
+  $Config::Model::Tk::ListEditor::VERSION = '1.316';
 }
 
 use strict;

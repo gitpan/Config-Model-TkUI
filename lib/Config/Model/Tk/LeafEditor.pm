@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::LeafEditor ;
 BEGIN {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.315';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.316';
 }
 
 use strict;
@@ -180,7 +180,7 @@ sub try {
     $logger->debug( "try: value $v") ;
     require Tk::Dialog ;
 
-    my @errors = $cw->{leaf}->check($v,1) ;
+    my @errors = $cw->{leaf}->check(value => $v,quiet => 1) ;
 
     if (@errors ) {
         $cw -> Dialog ( -title => 'Value error',
