@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::HashViewer ;
 BEGIN {
-  $Config::Model::Tk::HashViewer::VERSION = '1.316';
+  $Config::Model::Tk::HashViewer::VERSION = '1.317';
 }
 
 use strict;

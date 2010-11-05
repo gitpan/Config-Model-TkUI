@@ -9,7 +9,7 @@
 # 
 package Config::Model::Tk::LeafEditor ;
 BEGIN {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.316';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.317';
 }
 
 use strict;
