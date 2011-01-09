@@ -1,15 +1,15 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 package Config::Model::Tk::HashEditor ;
 BEGIN {
-  $Config::Model::Tk::HashEditor::VERSION = '1.317';
+  $Config::Model::Tk::HashEditor::VERSION = '1.319';
 }
 
 use strict;
@@ -495,24 +495,6 @@ sub delete_selection {
 	my $idx = $tklist->get($_) ;
 	$hash   -> delete($idx) ;
 	$tklist -> delete($_) ;
-	$cw->reload_tree ;
-    }
-}
-
-sub store {
-    my $cw = shift ;
-
-    eval {$cw->{hash}->set_checked_list_as_list(%{$cw->{check_list}}); } ;
-
-    if ($@) {
-	$cw -> Dialog ( -title => 'Value error',
-			-text  => $@ -> as_string,
-		      )
-            -> Show ;
-	$cw->reset_value ;
-    }
-    else {
-	# trigger redraw of Tk Tree
 	$cw->reload_tree ;
     }
 }

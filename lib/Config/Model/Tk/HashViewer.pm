@@ -1,15 +1,15 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 package Config::Model::Tk::HashViewer ;
 BEGIN {
-  $Config::Model::Tk::HashViewer::VERSION = '1.317';
+  $Config::Model::Tk::HashViewer::VERSION = '1.319';
 }
 
 use strict;

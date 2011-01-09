@@ -1,12 +1,12 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 #    Copyright (c) 2007-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUI.
@@ -51,8 +51,9 @@ my $build = Module::Build->new
     'Tk::ObjScanner' => '0'
   },
   'requires' => {
-    'Config::Model' => '1.212',
+    'Config::Model' => '1.228',
     'Exception::Class' => '0',
+    'File::Slurp' => '0',
     'Log::Log4perl' => '1.11',
     'Pod::POM' => '0',
     'Tk' => '0',

@@ -1,13 +1,13 @@
-# 
-# This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
-# This is free software, licensed under:
-# 
-#   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
 # -*- cperl -*-
+#
+# This file is part of Config-Model-TkUI
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
+# This is free software, licensed under:
+#
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+#
 
 # this file is used by test script
 
@@ -244,7 +244,7 @@
                
 		warn_unless => { type => 'leaf',
                                  value_type => 'string',
-			         warn_unless_match => 'foo',
+			         warn_unless_match => { foo => { msg => '', fix =>'$_ = "foo".$_;' }},
 			   },
 		always_warn => { type => 'leaf',
                                  value_type => 'string',

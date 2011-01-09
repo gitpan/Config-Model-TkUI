@@ -7,6 +7,7 @@ use Test::More tests => 5 ;
 use Tk;
 use Config::Model::TkUI;
 use Config::Model ;
+use Config::Model::Value ;
 use Log::Log4perl qw(get_logger :levels) ;
 
 
@@ -48,8 +49,10 @@ ok($inst,"created dummy instance") ;
 my $root = $inst -> config_root ;
 ok($root,"Config root created") ;
 
+$Config::Model::Value::nowarning=1;
 
 my $step = qq!
+warn_unless=qwerty
 std_id:ab X=Bv -
 std_id:ab2 -
 std_id:bc X=Av -
@@ -103,14 +106,14 @@ SKIP: {
 
     my @test ;
     foreach (1 .. 4 ) {
-	push @test, sub {$cmw->{keep_wiz} = 0 ; $cmw->{wizard}->go_forward; } ;
+	push @test, sub {$cmw->{keep_wiz_editor} = 0 ; $cmw->{wizard}->go_forward; } ;
     }
     foreach (1 .. 2 ) {
-	push @test, sub {$cmw->{keep_wiz} = 0 ; $cmw->{wizard}->go_backward;} ;
+	push @test, sub {$cmw->{keep_wiz_editor} = 0 ; $cmw->{wizard}->go_backward;} ;
     }
     # no problem if too many subs are defined: programs will exit
     foreach (1 .. 100 ) {
-	push @test, sub {$cmw->{keep_wiz} = 0 ; $cmw->{wizard}->go_forward; } ;
+	push @test, sub {$cmw->{keep_wiz_editor} = 0 ; $cmw->{wizard}->go_forward; } ;
     }
 
 
@@ -121,7 +124,7 @@ SKIP: {
  	}
     }
 
-    $cmw->_start_wizard('master') ;
+    $cmw->_start_wizard('master',1) ;
 
     ok(1,"wizard done") ;
 

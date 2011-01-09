@@ -1,15 +1,15 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 package Config::Model::Tk::LeafViewer ;
 BEGIN {
-  $Config::Model::Tk::LeafViewer::VERSION = '1.317';
+  $Config::Model::Tk::LeafViewer::VERSION = '1.319';
 }
 
 use strict;
@@ -123,9 +123,16 @@ sub get_info {
     my $m = $leaf->mandatory ;
     push @items, "is mandatory: ".($m ? 'yes':'no') if defined $m;
 
-    foreach my $what (qw/min max warn_if_match warn_unless_match warn grammar/) {
+    foreach my $what (qw/min max warn grammar/) {
 	my $v = $leaf->$what() ;
 	push @items, "$what value: $v" if defined $v;
+    }
+
+    foreach my $what (qw/warn_if_match warn_unless_match/) {
+	my $v = $leaf->$what() ;
+	foreach my $k (keys %$v) {
+            push @items, "$what value: $k";
+        }
     }
 
     return $leaf->element_name, @items;

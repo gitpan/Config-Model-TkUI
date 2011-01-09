@@ -1,3 +1,15 @@
+2011-01-09  Dominique Dumont  <domi.dumont@free.fr> 1.319
+
+        * LeafEditor: added fix button to fix warnings (if model provides a fix)
+        * Wizard: clicking on next or previous does save value from wizard. 'stop' button
+          will use new bail_out method from WizardHelper.
+
+2010-12-21  Dominique Dumont  <domi.dumont@free.fr> 1.318
+
+	* ListEditor: changed label of push button (minor)
+	* Run-time depends on File::Slurp
+	* LeafEditor: added external editor button
+
 2010-11-05  Dominique Dumont  <domi.dumont@free.fr> 1.317
 
         * TkUi.pm: in Tk::Error call Show on Dialog to avoid masking errors
@@ -9,7 +21,7 @@
 
 2010-10-19  Dominique Dumont  <domi.dumont@free.fr> 1.315
 
-	* Do no check value when creating widgets. Values will be checked 
+	* Do no check value when creating widgets. Values will be checked
 	  when saving file
 	* ListEditor: update 'set selected' entry when a list item is selected"
 
@@ -18,7 +30,7 @@
 	* removed stuff obsoleted by Config::Model 1.212
 	* Depends on Config::Model 1.212
 	* added utf8 characters in tests
-	
+
 2010-10-08  Dominique Dumont  <domi.dumont@free.fr> 1.313
 
 	* Added display of configuration warnings provided by

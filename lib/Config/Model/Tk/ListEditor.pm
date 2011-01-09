@@ -1,15 +1,15 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 package Config::Model::Tk::ListEditor ;
 BEGIN {
-  $Config::Model::Tk::ListEditor::VERSION = '1.317';
+  $Config::Model::Tk::ListEditor::VERSION = '1.319';
 }
 
 use strict;
@@ -120,12 +120,14 @@ sub Populate {
 
     }
     else {
-	my $disp = $cargo_type ;
-	$disp .= ' ('.$list->config_class_name.')' if $cargo_type eq 'node' ;
-	$disp .= " ($value_type)" if defined $value_type ;
-	$right_frame->Button(-text => "Push new $disp",
-			     -command => sub { $cw->push_entry('') ;} ,
-			    )-> pack( @fxe1);
+        my $elt_name = $list->element_name ;
+	my $disp = "$elt_name ( $cargo_type ";
+	$disp .=  $list->config_class_name.' )' if $cargo_type eq 'node' ;
+	$disp .= " $value_type )" if defined $value_type ;
+	my $b = $right_frame->Button(-text => "Push new $disp",
+                                     -command => sub { $cw->push_entry('') ;} ,
+                                    )-> pack( @fxe1);
+        $balloon->attach($b, -msg => "add a new $elt_name at the end of the list");
     }
 
 
@@ -372,24 +374,6 @@ sub remove_selection {
                :                         $list->get_all_indexes ;
     map { $_ = '<undef>' unless defined $_ } @insert ;
     $tklist->insert( end => @insert ) ;
-}
-
-sub store {
-    my $cw = shift ;
-
-    eval {$cw->{list}->set_checked_list_as_list(%{$cw->{check_list}}); } ;
-
-    if ($@) {
-	$cw -> Dialog ( -title => 'Value error',
-			-text  => $@->as_string,
-		      )
-            -> Show ;
-	$cw->reset_value ;
-    }
-    else {
-	# trigger redraw of Tk Tree
-	$cw->reload_tree ;
-    }
 }
 
 sub reload_tree {

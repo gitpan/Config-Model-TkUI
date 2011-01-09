@@ -1,17 +1,17 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI ;
 BEGIN {
-  $Config::Model::TkUI::VERSION = '1.317';
+  $Config::Model::TkUI::VERSION = '1.319';
 }
 
 use strict;
@@ -1033,8 +1033,8 @@ sub wizard {
     my $wiz = $cw->ConfigModelWizard
       (
 	-root     => $cw->{root},
-	-store_cb => sub{ $cw->force_element_display(@_)},
-	-end_cb   => sub{ $cw->deiconify; $cw->raise ; },
+	-store_cb => sub{ $cw->{modified_data} = 1 ;},
+	-end_cb   => sub{ $cw->deiconify; $cw->raise ; $cw->reload ;},
        # -show_cb => sub{ $cw->force_element_display(@_)},
       ) ;
 

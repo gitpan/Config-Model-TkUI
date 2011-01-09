@@ -33,3 +33,4 @@ t/config-model-ui.t
 t/config-model-wizard.t
 t/pod.t
 t/release-pod-syntax.t
+wr_data/foo/test1.cds

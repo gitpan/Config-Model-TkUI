@@ -1,12 +1,12 @@
-# 
+#
 # This file is part of Config-Model-TkUI
-# 
-# This software is Copyright (c) 2010 by Dominique Dumont.
-# 
+#
+# This software is Copyright (c) 2011 by Dominique Dumont.
+#
 # This is free software, licensed under:
-# 
+#
 #   The GNU Lesser General Public License, Version 2.1, February 1999
-# 
+#
 #    Copyright (c) 2008-2010 Dominique Dumont.
 #
 #    This file is part of Config-Model-TkUi.
@@ -27,7 +27,7 @@
 
 package Config::Model::Tk::AnyViewer ;
 BEGIN {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.317';
+  $Config::Model::Tk::AnyViewer::VERSION = '1.319';
 }
 
 use strict;
@@ -170,13 +170,23 @@ sub add_description {
 sub add_warning {
     my ($cw, $elt_obj) = @_ ;
 
-    my $msg = $elt_obj->warning_msg ;
-
+    my $msg = $elt_obj->warning_msg || ''  . "with " . $elt_obj->has_fixes." fixes";
+ 
     my $frame = $cw -> Frame ; # packed by caller 
     my $inner_frame = $frame->Frame ; # packed by update_warning
-    $inner_frame ->Label(
-                         -text => 'Warning', 
-                        ) ->pack(-anchor => 'w');
+
+    my $label_button_frame = $inner_frame->Frame->pack(@fxe1) ;
+    $label_button_frame ->Label(
+        -text => 'Warning', 
+    ) ->pack(-anchor => 'w', -side => 'left', -fill =>'x');
+
+    my $nb_fixes = $elt_obj->has_fixes ;
+
+    my $fix_widget = $label_button_frame -> Button(
+        -text => "Apply $nb_fixes fixes",
+        -state => $nb_fixes ? 'normal' : 'disabled' 
+    );
+    $fix_widget ->pack(-anchor => 'e', -side => 'right');
 
     my $warn_widget = $inner_frame->Scrolled('ROText',
                                         -scrollbars => 'ow',
@@ -190,6 +200,7 @@ sub add_warning {
     $warn_widget ->tagConfigure(qw/warning -lmargin1 2 -lmargin2 2 -rmargin 2 -background orange/);
 
     $cw->Advertise(warn_widget => $warn_widget) ;
+    $cw->Advertise(fix_widget  => $fix_widget) ;
     $cw->Advertise(warn_frame  => $inner_frame ) ;
 
     $cw->update_warning($elt_obj) ;
@@ -207,11 +218,23 @@ sub update_warning {
 
     my $wf = $cw->Subwidget('warn_frame') ;
     my $ww = $cw->Subwidget('warn_widget') ;
+    my $fw = $cw->Subwidget('fix_widget') ;
 
     if ($msg) {
         $ww->delete('0.0', 'end') ;
         $ww->insert('end',$msg,'warning') ;
         $wf->pack(@fbe1) ;
+        my $nb_fixes = $elt_obj->has_fixes ;
+        $fw->configure(
+            -text => "Apply $nb_fixes fixes",
+            -command => sub{ 
+                $elt_obj -> apply_fixes ;
+                $cw->reset_value ;
+                $cw->update_warning($elt_obj) ;
+                $cw->{store_cb}->() ;
+            }  ,
+            -state => $nb_fixes ? 'normal' : 'disabled' 
+        ) ;
     }
     else {
         $wf->packForget ;
