@@ -27,7 +27,7 @@
 
 package Config::Model::Tk::AnyViewer ;
 BEGIN {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.319';
+  $Config::Model::Tk::AnyViewer::VERSION = '1.320';
 }
 
 use strict;
@@ -168,7 +168,7 @@ sub add_description {
 }
 
 sub add_warning {
-    my ($cw, $elt_obj) = @_ ;
+    my ($cw, $elt_obj,$usage) = @_ ;
 
     my $msg = $elt_obj->warning_msg || ''  . "with " . $elt_obj->has_fixes." fixes";
  
@@ -180,13 +180,16 @@ sub add_warning {
         -text => 'Warning', 
     ) ->pack(-anchor => 'w', -side => 'left', -fill =>'x');
 
-    my $nb_fixes = $elt_obj->has_fixes ;
+    if ($usage eq 'edit') {
+        my $nb_fixes = $elt_obj->has_fixes ;
 
-    my $fix_widget = $label_button_frame -> Button(
-        -text => "Apply $nb_fixes fixes",
-        -state => $nb_fixes ? 'normal' : 'disabled' 
-    );
-    $fix_widget ->pack(-anchor => 'e', -side => 'right');
+        my $fix_widget = $label_button_frame -> Button(
+            -text => "Apply $nb_fixes fixes",
+            -state => $nb_fixes ? 'normal' : 'disabled' 
+        );
+        $fix_widget ->pack(-anchor => 'e', -side => 'right');
+        $cw->Advertise(fix_widget  => $fix_widget) ;
+    }
 
     my $warn_widget = $inner_frame->Scrolled('ROText',
                                         -scrollbars => 'ow',
@@ -200,7 +203,6 @@ sub add_warning {
     $warn_widget ->tagConfigure(qw/warning -lmargin1 2 -lmargin2 2 -rmargin 2 -background orange/);
 
     $cw->Advertise(warn_widget => $warn_widget) ;
-    $cw->Advertise(fix_widget  => $fix_widget) ;
     $cw->Advertise(warn_frame  => $inner_frame ) ;
 
     $cw->update_warning($elt_obj) ;
@@ -209,7 +211,7 @@ sub add_warning {
 }
 
 sub update_warning {
-    my ($cw, $elt_obj) = @_ ;
+    my ($cw, $elt_obj,$usage) = @_ ;
 
     my $msg = $elt_obj->warning_msg ;
     if (ref ($msg) eq 'HASH') {
@@ -224,17 +226,20 @@ sub update_warning {
         $ww->delete('0.0', 'end') ;
         $ww->insert('end',$msg,'warning') ;
         $wf->pack(@fbe1) ;
-        my $nb_fixes = $elt_obj->has_fixes ;
-        $fw->configure(
-            -text => "Apply $nb_fixes fixes",
-            -command => sub{ 
-                $elt_obj -> apply_fixes ;
-                $cw->reset_value ;
-                $cw->update_warning($elt_obj) ;
-                $cw->{store_cb}->() ;
-            }  ,
-            -state => $nb_fixes ? 'normal' : 'disabled' 
-        ) ;
+        
+        if ( defined $fw ) {
+            my $nb_fixes = $elt_obj->has_fixes;
+            $fw->configure(
+                -text    => "Apply $nb_fixes fixes",
+                -command => sub {
+                    $elt_obj->apply_fixes;
+                    $cw->reset_value;
+                    $cw->update_warning($elt_obj);
+                    $cw->{store_cb}->();
+                },
+                -state => $nb_fixes ? 'normal' : 'disabled'
+            );
+        }
     }
     else {
         $wf->packForget ;

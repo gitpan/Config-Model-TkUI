@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafViewer ;
 BEGIN {
-  $Config::Model::Tk::LeafViewer::VERSION = '1.319';
+  $Config::Model::Tk::LeafViewer::VERSION = '1.320';
 }
 
 use strict;
@@ -77,7 +77,7 @@ sub Populate {
     $cw->add_annotation($leaf)->pack(@fx);
     $cw->add_summary($leaf)->pack(@fx) ;
     $cw->add_description($leaf)->pack(@fx) ;
-    $cw->add_warning($leaf)->pack(@fx) ;
+    $cw->add_warning($leaf,'view')->pack(@fx) ;
     $cw->add_help('value help'   => $leaf->get_help($cw->{value}))->pack(@fx) ;
     $cw->add_info_button()       -> pack(@fxe1, -side => 'left' , -anchor => 'n') ;
     $cw->add_editor_button($path)-> pack(@fxe1, -side => 'right', -anchor => 'n') ;

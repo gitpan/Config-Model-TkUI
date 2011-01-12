@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::HashViewer ;
 BEGIN {
-  $Config::Model::Tk::HashViewer::VERSION = '1.319';
+  $Config::Model::Tk::HashViewer::VERSION = '1.320';
 }
 
 use strict;
@@ -59,7 +59,7 @@ sub Populate {
     }
 
     $cw->add_annotation($hash) -> pack(@fx);
-    $cw->add_warning($hash)->pack(@fx) ;
+    $cw->add_warning($hash,'view')->pack(@fx) ;
     $cw->add_summary($hash)    -> pack(@fx) ;
     $cw->add_description($hash)-> pack(@fx) ;
 

@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::HashEditor ;
 BEGIN {
-  $Config::Model::Tk::HashEditor::VERSION = '1.319';
+  $Config::Model::Tk::HashEditor::VERSION = '1.320';
 }
 
 use strict;
@@ -211,7 +211,7 @@ sub Populate {
     # set all buttons to their default state
     $cw->update_state(tklist => '', entry => '') ;
 
-    $cw->add_warning($hash)->pack(@fx) ;
+    $cw->add_warning($hash,'edit')->pack(@fx) ;
     $cw->add_info_button()->pack( @fx,qw/-anchor n/) ;
     $cw->add_summary($hash)->pack(@fx) ;
     $cw->add_description($hash)->pack(@fx) ;
