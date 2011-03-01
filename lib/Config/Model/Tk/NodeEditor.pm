@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NodeEditor ;
 BEGIN {
-  $Config::Model::Tk::NodeEditor::VERSION = '1.320';
+  $Config::Model::Tk::NodeEditor::VERSION = '1.321';
 }
 
 use strict;
@@ -19,6 +19,7 @@ use Carp ;
 use Tk::Pane ;
 use Tk::Balloon;
 use Text::Wrap;
+use Config::Model::Tk::NoteEditor ;
 
 use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
 use subs qw/menu_struct/ ;
@@ -30,7 +31,7 @@ my @fbe1 = qw/-fill both -expand 1/ ;
 my @fxe1 = qw/-fill x    -expand 1/ ;
 my @fx   = qw/-fill x    -expand 0/ ;
 
-my $logger = Log::Log4perl::get_logger(__PACKAGE__);
+my $logger = Log::Log4perl::get_logger("Tk::NodeEditor");
 
 sub ClassInit {
     my ($cw, $args) = @_;
@@ -60,6 +61,7 @@ sub Populate {
     #require Tk::Adjuster;
     #$cw -> Adjuster()->pack(-fill => 'x' , -side => 'top') ;
 
+    $cw->ConfigModelNoteEditor( -object => $node )->pack;
     $cw->add_info_button()->pack(@fxe1, qw/-anchor n/) ;
 
     if ($node->parent) {

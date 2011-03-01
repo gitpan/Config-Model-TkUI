@@ -51,7 +51,7 @@ my $build = Module::Build->new
     'Tk::ObjScanner' => '0'
   },
   'requires' => {
-    'Config::Model' => '1.228',
+    'Config::Model' => '1.235',
     'Exception::Class' => '0',
     'File::Slurp' => '0',
     'Log::Log4perl' => '1.11',
