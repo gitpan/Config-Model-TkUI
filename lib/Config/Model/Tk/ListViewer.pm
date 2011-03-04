@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::ListViewer ;
 BEGIN {
-  $Config::Model::Tk::ListViewer::VERSION = '1.321';
+  $Config::Model::Tk::ListViewer::VERSION = '1.322';
 }
 
 use strict;
