@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 BEGIN {
-  $Config::Model::TkUI::VERSION = '1.322';
+  $Config::Model::TkUI::VERSION = '1.323';
 }
 
 use strict;
@@ -30,6 +30,10 @@ use Pod::POM::View::Text ;
 use Tk::Photo ;
 use Tk::PNG ; # required for Tk::Photo to be able to load pngs
 use Tk::DialogBox ;
+use Tk::Adjuster;
+
+use Tk::Pod ;
+use Tk::Pod::Text; # for findpod
 
 use Config::Model::Tk::LeafEditor ;
 use Config::Model::Tk::CheckListEditor ;
@@ -65,6 +69,7 @@ no warnings "redefine" ;
 sub Tk::Error {
     my ($cw,$error,@locations) = @_;
     my $msg = (ref($error) && $error->can('as_string')) ? $error->as_string : $error ;
+    warn $msg ;
     $msg .= "Tk stack: \n@locations\n";
     $cw -> Dialog ( -title => 'Config::Model error',
                     -text  => $msg,
@@ -131,7 +136,7 @@ sub Populate {
     my $file_items = [[ qw/command wizard -command/, sub{ $cw->wizard }],
 		      [ qw/command reload -command/, sub{ $cw->reload }],
 		      [ command => 'check for errors',    -command => sub{ $cw->check(1)} ],
-		      [ command => 'check for warnings',  -command => sub{ $cw->check(1)} ],
+		      [ command => 'check for warnings',  -command => sub{ $cw->check(1,1)} ],
 		      [ qw/command save   -command/, sub{ $cw->save }],
 		      [ command => 'save in dir ...',
                         -command => sub{ $cw->save_in_dir ;} ],
@@ -191,7 +196,6 @@ sub Populate {
     $cw->{tktree} = $tree ;
 
     # add adjuster
-    require Tk::Adjuster;
     $bottom_frame -> Adjuster()->packAfter($tree, -side => 'left') ;
 
     # add headers
@@ -291,7 +295,7 @@ sub add_help_menu {
     my $about_sub = sub {
 	$cw->Dialog(-title => 'About',
 		    -text => "Config::Model::TkUI \n"
-		    ."(c) 2008-2010 Dominique Dumont \n"
+		    ."(c) 2008-2011 Dominique Dumont \n"
 		    ."Licensed under LGPLv2\n"
 		   ) -> Show ;
     };
@@ -310,9 +314,20 @@ sub add_help_menu {
 	$db-> Show ;
     };
 
+    my $class = $cw->{root}->config_class_name ;
+    my $man_sub = sub {
+        $cw -> Pod(
+            -tree => 0,
+            -file => "Config::Model::models::".$class ,
+            -title => $class ,
+            -exitbutton => 0,
+        ) ;
+    };
+
     my $help_items = [[ qw/command About -command/, $about_sub ],
 		      [ qw/command Todo  -command/, $todo_sub  ],
 		      [ qw/command Usage -command/, $help_sub  ],
+		      [ command => "$class help", -command => $man_sub ],
 		     ] ;
     $menubar->cascade( -label => 'Help', -menuitems => $help_items ) ;
 }
@@ -499,6 +514,13 @@ sub on_cut_buffer_dump {
 	# if hash create keys
 	my @keys = ($sel =~ /\n/m) ? split(/\n/,$sel) : ($sel) ;
 	map{ $obj->fetch_with_id($_) } @keys ;
+    }
+    elsif ($obj->isa('Config::Model::ListId') and $obj->get_cargo_type !~ /node/ ) {
+	# if array, push values
+	my @v = ($sel =~ /\n/m) ? split(/\n/,$sel) 
+	      : ($sel =~ /,/)   ? split(/,/, $sel)
+	      :                  ($sel) ;
+	$obj->push(@v) ;
     }
     # else ignore
 
@@ -775,7 +797,7 @@ sub disp_leaf {
 	no warnings qw/uninitialized/ ;
 	$img = $cust_img if (defined $value and $std_v ne $value) ;
 	$img = $warn_img if $leaf_object->warning_msg ;
-	$img = $error_img unless $leaf_object->check($value) ;
+	$img = $error_img if $leaf_object->error_msg;
     }
 
     if (defined $img) {
@@ -1092,9 +1114,27 @@ configuration tree. Beware, there's no "undo" operation.
 
 =item *
 
-Pasting cut buffer into a leaf element will store the content of the
-buffer into the element. This should be used with C<string> or
-C<uniline> elements.
+Pasting cut buffer into:
+
+=over
+
+=item *
+
+a leaf element will store the content of the
+buffer into the element.
+
+=item *
+
+a list element will split the content of the
+buffer with /\n/ or /,/ and push the resulting array at the 
+end of the list element. 
+
+=item *
+
+a hash element will use the content of the cut buffer to create a new key 
+in the hash element. 
+
+=back
 
 =back
 

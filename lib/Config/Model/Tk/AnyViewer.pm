@@ -27,7 +27,7 @@
 
 package Config::Model::Tk::AnyViewer ;
 BEGIN {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.322';
+  $Config::Model::Tk::AnyViewer::VERSION = '1.323';
 }
 
 use strict;
@@ -39,6 +39,7 @@ use Tk::ROText;
 use Tk::Dialog ;
 use Config::Model::TkUI ;
 use Log::Log4perl qw(get_logger :levels);
+use Tk::Pod::Text ;
 
 use vars qw/$icon_path/ ;
 
@@ -116,7 +117,7 @@ sub add_help {
     my $cw = shift ;
     my $help_label = shift ;
     my $help = shift || '' ;
-    my $force_text_widget = shift || 0;
+    my $force_text_widget = shift || ''; # pod or text
 
     my $help_frame = $cw-> Frame();
 
@@ -128,19 +129,25 @@ sub add_help {
 
     my $widget ;
     chomp $help ;
-    if (  $force_text_widget or $help =~ /\n/ or length($help) > 50) {
-        $widget = $help_frame->Scrolled('ROText',
-                                        -scrollbars => 'ow',
-                                        -wrap => 'word',
-                                        -font => $text_font ,
-                                        -relief => 'ridge',
-                                        -height => 4,
-                                       );
-
-        $widget ->pack( @fbe1 ) ->insert('end',$help,'help') ;
-        $widget
-          ->tagConfigure(qw/help -lmargin1 2 -lmargin2 2 -rmargin 2/);
+#    if (  $force_text_widget eq 'pod' or $help =~ /\n=\w+|[A-Z]</ ) {
+    if ($force_text_widget or $help =~ /\n/ or length($help) > 50) {
+        $widget = $help_frame->PodText;
+        $widget ->pack( @fbe1 ) ;
+        $cw->update_help($widget, $help) ;
     }
+    # elsif ($force_text_widget or $help =~ /\n/ or length($help) > 50) {
+        # $widget = $help_frame->Scrolled('ROText',
+                                        # -scrollbars => 'ow',
+                                        # -wrap => 'word',
+                                        # -font => $text_font ,
+                                        # -relief => 'ridge',
+                                        # -height => 4,
+                                       # );
+# 
+        # $widget ->pack( @fbe1 ) ->insert('end',$help,'help') ;
+        # $widget
+          # ->tagConfigure(qw/help -lmargin1 2 -lmargin2 2 -rmargin 2/);
+    # }
     else {
         $widget = $help_frame->Label( -text => $help,
                                       -justify => 'left',
@@ -152,6 +159,14 @@ sub add_help {
     }
 
     return wantarray ? ($help_frame,$widget) : $help_frame ;
+}
+
+sub update_help {
+    my ($cw,$w,$help) = @_ ;
+    # work around RT #67306
+    my $t = $cw->toplevel->cget('-title');
+    $w->text("\n\n=pod\n\n\n$help\n\n=cut\n\n") ;
+    $w->toplevel->title($t);
 }
 
 sub add_summary {

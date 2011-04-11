@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafViewer ;
 BEGIN {
-  $Config::Model::Tk::LeafViewer::VERSION = '1.322';
+  $Config::Model::Tk::LeafViewer::VERSION = '1.323';
 }
 
 use strict;
@@ -107,6 +107,11 @@ sub get_info {
 		);
 
     my $std = $leaf->fetch(qw/mode standard check no/) ;
+
+    warn "FIXME: remove work-around now that Config::Model 1.242 is out."
+        if $Config::Model::VERSION > 1.241 ;
+    my $normal = $leaf->fetch(qw/check no/) ;
+    
     if (defined $leaf->upstream_default) {
 	push @items, "upstream_default value: " . $leaf->upstream_default ;
     }
