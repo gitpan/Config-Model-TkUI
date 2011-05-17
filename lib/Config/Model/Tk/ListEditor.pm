@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::ListEditor ;
 BEGIN {
-  $Config::Model::Tk::ListEditor::VERSION = '1.323';
+  $Config::Model::Tk::ListEditor::VERSION = '1.324';
 }
 
 use strict;
@@ -232,7 +232,7 @@ sub push_entry {
     my $cargo_type = $list->cargo_type ;
     my $value_type = $list->get_cargo_info('value_type') ; # may be undef
     if ($cargo_type eq 'leaf' and $value_type ne 'enum' and $value_type ne 'reference') {
-	return unless $add;
+	return unless length($add);
 	eval {$list->push($add) ;};
     }
     else {
@@ -255,7 +255,7 @@ sub push_entry {
     my @new_idx = $list->get_all_indexes ;
     $logger->debug("new list idx: ". join(',',@new_idx));
 
-    my $insert = $add || $#new_idx ;
+    my $insert = length($add) ? $add : $#new_idx ;
     $tklist->insert('end',$insert);
 
     return 1 ;

@@ -25,6 +25,8 @@ lib/Config/Model/Tk/icons/dialog-warning.png
 lib/Config/Model/Tk/icons/down.png
 lib/Config/Model/Tk/icons/eraser.png
 lib/Config/Model/Tk/icons/fontsizeup.png
+lib/Config/Model/Tk/icons/gnome-next.png
+lib/Config/Model/Tk/icons/gnome-previous.png
 lib/Config/Model/Tk/icons/next.png
 lib/Config/Model/Tk/icons/remove.png
 lib/Config/Model/Tk/icons/rotate_cw.png
