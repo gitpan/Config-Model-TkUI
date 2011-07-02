@@ -113,7 +113,7 @@
 
     [
         name              => 'Master',
-        experience        => [ [qw/tree_macro warp/] => 'advanced' ],
+        experience        => [ [qw/warp/] => 'advanced' ],
         class_description => "
 
 =head1 coucou
@@ -145,6 +145,29 @@ things.
             },
         ],
         element => [
+            tree_macro => {
+                type       => 'leaf',
+                value_type => 'enum',
+                choice     => [qw/XY XZ mXY/],
+                help       => {
+                    XY  => 'XY help',
+                    XZ  => 'XZ help',
+                    mXY => 'mXY help',
+                }
+            },
+            pop_in_out => {
+                type       => 'leaf',
+                level => 'hidden',
+                value_type => 'uniline',
+                default    => 'yada yada',
+                warp => {  
+                    follow            => '! tree_macro',
+                    rules             => [
+                        XZ => { level => 'normal' },
+                    ],
+                },
+            },
+
             std_id => {
                 type       => 'hash',
                 index_type => 'string',
@@ -210,16 +233,6 @@ things.
                     type       => 'leaf',
                     value_type => 'enum',
                     choice     => [qw/A B C/],
-                }
-            },
-            tree_macro => {
-                type       => 'leaf',
-                value_type => 'enum',
-                choice     => [qw/XY XZ mXY/],
-                help       => {
-                    XY  => 'XY help',
-                    XZ  => 'XZ help',
-                    mXY => 'mXY help',
                 }
             },
             warp => {

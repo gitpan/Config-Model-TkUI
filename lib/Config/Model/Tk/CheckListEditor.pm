@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::CheckListEditor ;
 BEGIN {
-  $Config::Model::Tk::CheckListEditor::VERSION = '1.324';
+  $Config::Model::Tk::CheckListEditor::VERSION = '1.325';
 }
 
 use strict;

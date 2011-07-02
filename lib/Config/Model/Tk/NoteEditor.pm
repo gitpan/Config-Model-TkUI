@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NoteEditor ;
 BEGIN {
-  $Config::Model::Tk::NoteEditor::VERSION = '1.324';
+  $Config::Model::Tk::NoteEditor::VERSION = '1.325';
 }
 
 use strict;

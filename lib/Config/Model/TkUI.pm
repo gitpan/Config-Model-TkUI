@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 BEGIN {
-  $Config::Model::TkUI::VERSION = '1.324';
+  $Config::Model::TkUI::VERSION = '1.325';
 }
 
 use strict;
@@ -230,7 +230,8 @@ sub Populate {
     my $b3_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
 		     $cw->on_select($item)} ;
     $cw->bind('<Button-3>', $b3_sub) ;
-    $cw->bind('<Double-Button-1>', $b3_sub) ;
+    # pb: rapid click outside the hlist will trigger $b3_sub
+    #$cw->bind('<Double-Button-1>', $b3_sub) ;
 
     # bind button2 to get cut buffer content and try to store cut buffer content
     my $b2_sub = sub{my $item = $tree->nearest($tree->pointery - $tree->rooty) ;
@@ -412,7 +413,7 @@ sub save {
        eval { $cw->{root}->instance->write_back(@wb_args); } ;
        if ($@) {
          $cw -> Dialog ( -title => 'Save error',
-                         -text  => $@->as_string,
+                         -text  => ref($@) ? $@->as_string : $@ ,
                        )
             -> Show ;
        }
