@@ -8,8 +8,8 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::ListEditor ;
-BEGIN {
-  $Config::Model::Tk::ListEditor::VERSION = '1.325';
+{
+  $Config::Model::Tk::ListEditor::VERSION = '1.326';
 }
 
 use strict;
@@ -161,6 +161,7 @@ sub Populate {
             ->pack(@fxe1);
 
 	$value_entry -> pack  (@fxe1) ;
+        $cw->add_warning($list, 'edit')->pack(@fx) ;
     }
     else {
         my $elt_name = $list->element_name;
@@ -417,6 +418,7 @@ sub remove_selection {
                :                         $list->get_all_indexes ;
     map { $_ = '<undef>' unless defined $_ } @insert ;
     $tklist->insert( end => @insert ) ;
+    $cw->update_warning($list) ;
 }
 
 sub reload_tree {

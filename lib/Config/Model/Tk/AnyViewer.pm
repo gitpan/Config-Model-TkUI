@@ -26,8 +26,8 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 package Config::Model::Tk::AnyViewer ;
-BEGIN {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.325';
+{
+  $Config::Model::Tk::AnyViewer::VERSION = '1.326';
 }
 
 use strict;
@@ -243,6 +243,7 @@ sub update_warning {
 
     $ww->delete('0.0', 'end') ;
 
+    $elt_obj->check ;
     my $err = $elt_obj -> error_msg || '' ;
     $ww->insert('end',$err,'error') if $err ;
     

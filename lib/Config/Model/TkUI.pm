@@ -10,8 +10,8 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI ;
-BEGIN {
-  $Config::Model::TkUI::VERSION = '1.325';
+{
+  $Config::Model::TkUI::VERSION = '1.326';
 }
 
 use strict;

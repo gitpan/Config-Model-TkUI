@@ -106,7 +106,7 @@
                 type       => 'leaf',
                 value_type => 'enum',
                 choice     => [qw/Av Bv Cv/]
-            },
+            }, 
         ],
         include => 'X_base_class',
     ],
@@ -235,7 +235,19 @@ things.
                     choice     => [qw/A B C/],
                 }
             },
-            warp => {
+            
+            "list_with_warn_duplicates" => { 
+                type => 'list', 
+                duplicates => 'warn' , 
+                cargo => { type => 'leaf', value_type => 'string' } 
+            },
+             "hash_with_warn_duplicates" => { 
+                type => 'hash',
+                index_type => 'string', 
+                duplicates => 'warn' , 
+                cargo => { type => 'leaf', value_type => 'string' } 
+            },
+           warp => {
                 type              => 'warped_node',
                 follow            => '! tree_macro',
                 config_class_name => 'SlaveY',

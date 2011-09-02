@@ -8,8 +8,8 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::ListViewer ;
-BEGIN {
-  $Config::Model::Tk::ListViewer::VERSION = '1.325';
+{
+  $Config::Model::Tk::ListViewer::VERSION = '1.326';
 }
 
 use strict;
@@ -61,6 +61,7 @@ sub Populate {
     }
 
     $cw->add_annotation($list)->pack(@fx) ;
+    $cw->add_warning($list, 'view')->pack(@fx) ;
     $cw->add_summary($list)->pack(@fx) ;
     $cw->add_description($list)->pack(@fx) ;
 

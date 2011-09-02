@@ -8,8 +8,8 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeEditor ;
-BEGIN {
-  $Config::Model::Tk::NodeEditor::VERSION = '1.325';
+{
+  $Config::Model::Tk::NodeEditor::VERSION = '1.326';
 }
 
 use strict;
