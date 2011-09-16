@@ -26,4 +26,4 @@ requires:
   Tk: 0
   Tk::DirSelect: 0
   Tk::Tree: 0
-version: 1.326
+version: 1.327
