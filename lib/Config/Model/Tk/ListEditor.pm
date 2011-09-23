@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::ListEditor ;
 {
-  $Config::Model::Tk::ListEditor::VERSION = '1.327';
+  $Config::Model::Tk::ListEditor::VERSION = '1.328';
 }
 
 use strict;
@@ -87,14 +87,6 @@ sub Populate {
     $balloon->attach( $tklist,
         -msg => 'select an element and perform ' . 'an action on the right' );
 
-    my $cargo_type = $list->cargo_type;
-    my @insert =
-        $cargo_type eq 'leaf'
-      ? $list->fetch_all_values( check => 'no' )
-      : $list->get_all_indexes;
-    map { $_ = '<undef>' unless defined $_ } @insert;
-    $tklist->insert( end => @insert );
-
     my $right_frame =
       $elt_button_frame->Frame->pack( @fxe1, qw/-side right -anchor n/ );
 
@@ -132,6 +124,8 @@ sub Populate {
         },
     )->pack( -side => 'left', @fxe1 );
     $balloon->attach( $rm_all_b, -msg => 'Remove all elements from the list' );
+
+    my $cargo_type = $list->cargo_type;
 
     if ($cargo_type eq 'leaf') {
         my $sort_b = $mv_rm_frame->Button(
@@ -178,8 +172,29 @@ sub Populate {
 
 
     $cw->{tklist} = $tklist;
+    $cw -> reset_value ;
+
 
     $cw->Tk::Frame::Populate($args);
+}
+
+#
+# New subroutine "reset_value" extracted - Wed Sep 21 11:33:51 2011.
+#
+sub reset_value {
+    my $cw = shift ;
+    my $list = $cw->{list};
+
+    my $cargo_type = $list->cargo_type;
+    $cw->{tklist}->delete (0, 'end') ;
+    my @insert =
+        $cargo_type eq 'leaf'
+      ? $list->fetch_all_values( check => 'no' )
+      : $list->get_all_indexes;
+    map { $_ = '<undef>' unless defined $_ } @insert;
+    $cw->{tklist}->insert( end => @insert );
+
+    return ($cargo_type, \@insert);
 }
 
 sub add_set_entry {
