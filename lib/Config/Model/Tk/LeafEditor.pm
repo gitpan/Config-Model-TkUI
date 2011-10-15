@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafEditor ;
 {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.328';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.329';
 }
 
 use strict;
@@ -247,7 +247,6 @@ sub store {
                         -text  => $@->as_string,
                       )
             -> Show ;
-        $cw->reset_value ;
     }
     else {
         # trigger redraw of Tk Tree
