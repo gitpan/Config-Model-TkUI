@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.110440'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +25,6 @@ requires:
   Pod::POM: 0
   Tk: 0
   Tk::DirSelect: 0
+  Tk::Pod: 0
   Tk::Tree: 0
-version: 1.329
+version: 1.330

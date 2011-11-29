@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafViewer ;
 {
-  $Config::Model::Tk::LeafViewer::VERSION = '1.329';
+  $Config::Model::Tk::LeafViewer::VERSION = '1.330';
 }
 
 use strict;

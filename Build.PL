@@ -58,6 +58,7 @@ my $build = Module::Build->new
     'Pod::POM' => '0',
     'Tk' => '0',
     'Tk::DirSelect' => '0',
+    'Tk::Pod' => '0',
     'Tk::Tree' => '0'
   },
 

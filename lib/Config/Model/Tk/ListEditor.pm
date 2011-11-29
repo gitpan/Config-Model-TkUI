@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::ListEditor ;
 {
-  $Config::Model::Tk::ListEditor::VERSION = '1.329';
+  $Config::Model::Tk::ListEditor::VERSION = '1.330';
 }
 
 use strict;
@@ -266,13 +266,13 @@ sub push_entry {
     else {
 	# trigger redraw of Tk Tree
 	$cw->{store_cb}->(1);
+
+        my @new_idx = $list->get_all_indexes ;
+        $logger->debug("new list idx: ". join(',',@new_idx));
+
+        my $insert = length($add) ? $add : $#new_idx ;
+        $tklist->insert('end',$insert);
     }
-
-    my @new_idx = $list->get_all_indexes ;
-    $logger->debug("new list idx: ". join(',',@new_idx));
-
-    my $insert = length($add) ? $add : $#new_idx ;
-    $tklist->insert('end',$insert);
 
     return 1 ;
 }

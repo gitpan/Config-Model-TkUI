@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::HashEditor;
 {
-  $Config::Model::Tk::HashEditor::VERSION = '1.329';
+  $Config::Model::Tk::HashEditor::VERSION = '1.330';
 }
 
 use strict;
@@ -30,7 +30,7 @@ Construct Tk::Widget 'ConfigModelHashEditor';
 my @fbe1   = qw/-fill both -expand 1/;
 my @fxe1   = qw/-fill x    -expand 1/;
 my @fx     = qw/-fill x    /;
-my $logger = Log::Log4perl::get_logger(")Tk::HashEditor");
+my $logger = Log::Log4perl::get_logger("Tk::HashEditor");
 
 my $entry_width = 15;
 

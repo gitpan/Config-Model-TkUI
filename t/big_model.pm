@@ -144,6 +144,9 @@ things.
                 auto_create => 1
             },
         ],
+        accept => [ 
+            'foo.*' => { type => 'leaf', value_type => 'uniline'}
+        ],
         element => [
             tree_macro => {
                 type       => 'leaf',

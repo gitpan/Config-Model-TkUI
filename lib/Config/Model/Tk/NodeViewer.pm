@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NodeViewer ;
 {
-  $Config::Model::Tk::NodeViewer::VERSION = '1.329';
+  $Config::Model::Tk::NodeViewer::VERSION = '1.330';
 }
 
 use strict;
@@ -143,6 +143,11 @@ sub get_info {
     my @items = ('type : '. $node->get_type ,
 		 'class name : '.$node->config_class_name ,
 		);
+
+    my @rexp = $node->accept_regexp ;
+    if (@rexp) {
+	push @items, 'accept : /^'.join('$/, /^',@rexp).'$/';
+    }
 
     return $node->element_name,@items ;
 }

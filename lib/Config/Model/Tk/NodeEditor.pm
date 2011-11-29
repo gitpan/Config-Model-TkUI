@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NodeEditor ;
 {
-  $Config::Model::Tk::NodeEditor::VERSION = '1.329';
+  $Config::Model::Tk::NodeEditor::VERSION = '1.330';
 }
 
 use strict;
@@ -21,7 +21,7 @@ use Tk::Balloon;
 use Text::Wrap;
 use Config::Model::Tk::NoteEditor ;
 
-use base qw/Tk::Frame Config::Model::Tk::AnyViewer/;
+use base qw/Config::Model::Tk::NodeViewer/;
 use subs qw/menu_struct/ ;
 
 
@@ -57,6 +57,12 @@ sub Populate {
 
     $cw->fill_pane ;
 
+    # insert a widget for "accepted" elements
+    my @rexp = $node->accept_regexp ;
+    if (@rexp) {
+	$cw-> add_accept_entry(@rexp) ;
+    }
+
     # add adjuster
     #require Tk::Adjuster;
     #$cw -> Adjuster()->pack(-fill => 'x' , -side => 'top') ;
@@ -71,7 +77,8 @@ sub Populate {
     else {
 	$cw->add_help(class   => $node->get_help)->pack(@fx) ;
     }
-    $cw->SUPER::Populate($args) ;
+    # don't call directly SUPER::Populate as it's LeafViewer's populate
+    $cw->Tk::Frame::Populate($args) ;
 }
 
 sub reload {
@@ -168,17 +175,32 @@ sub fill_pane {
     map {my $w = delete $cw->{elt_widgets}{$_};$w->destroy } keys %is_elt_drawn ;
 }
 
-sub get_info {
-    my $cw = shift ;
+sub add_accept_entry {
+    my ($cw,@rexp) = @_ ;
 
     my $node = $cw->{node} ;
+    my $f = $cw->Frame(-relief=> 'groove', -borderwidth => 1);
+    $f ->pack(-side =>'top',@fx) ;
 
-    my @items = ('type : '. $node->get_type ,
-		 'class name : '.$node->config_class_name ,
-		);
+    my $accepted = '' ;
+    $f -> Label(-text => 'accept : /'.join('/, /',@rexp).'/') -> pack ;
 
-    return $node->element_name,@items ;
+    my $e = $f->Entry(-textvariable => \$accepted)
+		  ->pack(qw/-side left -anchor w/,@fxe1) ;
+    my $sub = sub {
+    	return unless $accepted ;
+    	my $ok = 0 ;
+    	map { $ok ++ if $accepted =~ /^$_$/ } @rexp ; 
+	if (not $ok) {
+	    die "Cannot accept $accepted, it does not match any accepted regexp\n";
+	}
+    	$node->fetch_element($accepted); 
+	$cw->{store_cb}->();
+	$cw->fill_pane; 
+	$cw->{pane}->yview(moveto => 1);
+    };
+    
+    $e->bind("<Return>"   => $sub) ;
 }
-
 
 1;
