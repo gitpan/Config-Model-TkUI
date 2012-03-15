@@ -10,12 +10,13 @@
 
 package Config::Model::Tk::Wizard ;
 {
-  $Config::Model::Tk::Wizard::VERSION = '1.331';
+  $Config::Model::Tk::Wizard::VERSION = '1.332';
 }
 
 use strict;
 use warnings ;
 use Carp ;
+use Try::Tiny ;
 
 use base qw/Tk::Toplevel/;
 use vars qw/$icon_path/ ;
@@ -213,7 +214,7 @@ sub start_wizard {
     $back->pack(qw/-side left -fill x -expand 1/);
 
     my $stop = $button_f->Button(
-        -text    => 'Stop',
+        -text    => 'Store and stop',
         -command => sub {
             $cw->{ed_w} -> store if $cw->{ed_w}->can('store');
             $cw->{keep_wiz_editor} = 0;
@@ -221,6 +222,15 @@ sub start_wizard {
         }
     );
     $stop->pack(qw/-side left -fill x -expand 1/);
+
+    my $quit = $button_f->Button(
+        -text    => 'quit wizard',
+        -command => sub {
+            $cw->{keep_wiz_editor} = 0;
+            $cw->{wizard}->bail_out;
+        }
+    );
+    $quit->pack(qw/-side left -fill x -expand 1/);
 
     my $forw = $button_f->Button(
         -text    => 'Next',
@@ -245,11 +255,17 @@ sub start_wizard {
     {
         $cb_table{$cb_key} = sub {
             my ( $scanner, $data_ref, $node, $element_name ) = @_;
+            my @all_args = @_ ; # @_ does not work in try blocks
             $logger->info( "$cb_key (element $element_name) called on '",
                 $node->name, "'->'$element_name'" );
             map { $_->destroy if Tk::Exists($_) } $cw->{ed_frame}->children;
             $cw->{keep_wiz_editor} = 1;
-            $cw->$cb_key(@_);
+            try { 
+                $cw->$cb_key(@all_args); 
+            }
+            catch {
+                $cw->{keep_wiz_editor} = 0 ; # destroy wizard in case of error
+            } ;
             my $loop_c = 0;
             $logger->debug( "$cb_key wizard entered local loop ", ++$loop_c );
             $cw->DoOneEvent() while $cw->{keep_wiz_editor};

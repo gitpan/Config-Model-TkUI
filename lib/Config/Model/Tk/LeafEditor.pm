@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafEditor ;
 {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.331';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.332';
 }
 
 use strict;
@@ -228,7 +228,7 @@ sub delete {
         # trigger redraw of Tk Tree
         $cw->reset_value ;
         $cw->update_warning($cw->{leaf}) ;
-        $cw->parent->parent->parent->parent->reload(1) ;
+        $cw->parent->parent->parent->parent->reload() ;
     }
 }
 
@@ -309,8 +309,15 @@ sub exec_external_editor {
     }
     $h->autoflush(1);
     $cw->fileevent($h, 'readable' => [\&_read_stdout, $cw]);
+    
+    # prevent navigation in the tree (and destruction of this widget
+    # while the external editor is active). See mastering Perl/Tk p302
+    $cw->grab ;
 
     $cw->waitVariable(\$cw->{ed_done});
+    
+    $cw->grabRelease; 
+    
     my $new_v = read_file($fh->filename) ;
     print "exec_external_editor done with '$new_v'\n";
     $cw->store($new_v);

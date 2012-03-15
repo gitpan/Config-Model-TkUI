@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 {
-  $Config::Model::TkUI::VERSION = '1.331';
+  $Config::Model::TkUI::VERSION = '1.332';
 }
 
 use strict;
@@ -126,7 +126,6 @@ sub Populate {
 
     # initialize internal attributes
     $cw->{location} = '';
-    $cw->{modified_data} = 0;
 
     $cw->setup_scanner() ;
 
@@ -418,14 +417,13 @@ sub save {
             -> Show ;
        }
     }
-    $cw->{modified_data} = 0 ;
 }
 
 sub save_if_yes {
     my $cw =shift ;
     my $text = shift || "Save data ?" ;
 
-    if ($cw->{modified_data}) {
+    if ($cw->{root}->instance->needs_save) {
 	my $answer = $cw->Dialog(-title => "quit",
 				 -text  => $text,
 				 -buttons => [ qw/yes no/],
@@ -451,8 +449,7 @@ sub quit {
 
 sub reload {
     my $cw =shift ;
-    carp "reload: too many parameters" if @_ > 2 ;
-    my $is_modif           = shift || 0; # whether values where modified
+    carp "reload: too many parameters" if @_ > 1 ;
     my $force_display_path = shift ;     # force open editor on this path
 
     $logger->trace("reloading tk tree".
@@ -460,7 +457,6 @@ sub reload {
 		  ) ;
 
     my $tree = $cw->{tktree} ;
-    $cw->{modified_data} = 1 if $is_modif ;
 
     my $instance_name = $cw->{root}->instance->name ;
 
@@ -549,7 +545,7 @@ sub force_element_display {
     my $elt_obj = shift ;
 
     $logger->trace( "force display of ".$elt_obj->location );
-    $cw->reload(0, $elt_obj->location) ;
+    $cw->reload($elt_obj->location) ;
 }
 
 sub prune {
@@ -1027,7 +1023,7 @@ sub edit_paste {
 	}
     }
 
-    $cw->reload(1) if @$cut_buf;
+    $cw->reload() if @$cut_buf;
 }
 
 sub wizard {
@@ -1051,7 +1047,6 @@ sub setup_wizard {
     return $cw->ConfigModelWizard
       (
 	-root     => $cw->{root},
-	-store_cb => sub{ $cw->{modified_data} = 1 ;},
 	-end_cb   => $end_sub,
       ) ;
 }

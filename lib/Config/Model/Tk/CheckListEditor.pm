@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::CheckListEditor ;
 {
-  $Config::Model::Tk::CheckListEditor::VERSION = '1.331';
+  $Config::Model::Tk::CheckListEditor::VERSION = '1.332';
 }
 
 use strict;
@@ -238,7 +238,7 @@ sub reset_value {
 
 sub reload_tree {
     my $cw = shift ;
-    $cw->parent->parent->parent->parent->reload(1) ;
+    $cw->parent->parent->parent->parent->reload() ;
 }
 
 1;

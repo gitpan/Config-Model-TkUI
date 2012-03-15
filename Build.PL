@@ -51,7 +51,7 @@ my $build = Module::Build->new
     'Tk::ObjScanner' => '0'
   },
   'requires' => {
-    'Config::Model' => '1.263',
+    'Config::Model' => '2.001',
     'Exception::Class' => '0',
     'File::Slurp' => '0',
     'Log::Log4perl' => '1.11',
@@ -59,7 +59,8 @@ my $build = Module::Build->new
     'Tk' => '0',
     'Tk::DirSelect' => '0',
     'Tk::Pod' => '0',
-    'Tk::Tree' => '0'
+    'Tk::Tree' => '0',
+    'Try::Tiny' => '0'
   },
 
    add_to_cleanup => [qw/stderr.log wr_data/] ,
