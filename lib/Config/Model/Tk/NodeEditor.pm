@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NodeEditor ;
 {
-  $Config::Model::Tk::NodeEditor::VERSION = '1.332';
+  $Config::Model::Tk::NodeEditor::VERSION = '1.333';
 }
 
 use strict;
@@ -124,7 +124,7 @@ sub fill_pane {
 	    my $leaf = $node->fetch_element($c) ;
 	    my $v = $node->fetch_element_value(name => $c, check  => 'no') ;
 	    my $store_sub = sub {$leaf->store($v); 
-				 $cw->{store_cb}->(1,undef,$elt_path);
+				 $cw->{store_cb}->($elt_path);
 				 $cw->fill_pane;
 			     };
 	    my $v_type = $leaf->value_type ;

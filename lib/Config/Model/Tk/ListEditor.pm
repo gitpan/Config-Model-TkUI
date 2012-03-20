@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::ListEditor ;
 {
-  $Config::Model::Tk::ListEditor::VERSION = '1.332';
+  $Config::Model::Tk::ListEditor::VERSION = '1.333';
 }
 
 use strict;
@@ -265,7 +265,7 @@ sub push_entry {
     }
     else {
 	# trigger redraw of Tk Tree
-	$cw->{store_cb}->(1);
+	$cw->{store_cb}->();
 
         my @new_idx = $list->get_all_indexes ;
         $logger->debug("new list idx: ". join(',',@new_idx));
@@ -292,7 +292,7 @@ sub set_entry {
     $tklist->insert($idx, $data) ;
     $tklist->selectionSet($idx ) ;
     $cw->{list}->fetch_with_id($idx)->store($data) ;
-    $cw->{store_cb}->(1) ;
+    $cw->{store_cb}->() ;
 }
 
 sub add_set_all_b {
@@ -339,7 +339,7 @@ sub set_all_items {
     $tklist->delete(0,'end') ;
     $tklist->insert(0, @list) ;
     $cw->{list}->load_data(\@list) ;
-    $cw->{store_cb}->(1) ;
+    $cw->{store_cb}->() ;
 }
 
 sub sort_content {
@@ -353,7 +353,7 @@ sub sort_content {
     $tklist->delete(0,'end') ;
     $tklist->insert(0, @list) ;
     $list->load_data(\@list) ;
-    $cw->{store_cb}->(1) ;
+    $cw->{store_cb}->() ;
 }
 
 
@@ -412,7 +412,7 @@ sub swap {
     }
 
     $tklist->selectionSet($idb ) ;
-    $cw->{store_cb}->(1) ;
+    $cw->{store_cb}->() ;
 }
 
 sub remove_selection {
@@ -424,7 +424,7 @@ sub remove_selection {
 	$logger->debug( "remove_selection: removing index $_" );
 	$list   -> remove($_) ;
     }
-    $cw->{store_cb}->(1) ;
+    $cw->{store_cb}->() ;
 
     # redraw the list content
     $tklist -> delete(0,'end') ;

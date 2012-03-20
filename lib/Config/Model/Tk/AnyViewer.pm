@@ -27,7 +27,7 @@
 
 package Config::Model::Tk::AnyViewer ;
 {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.332';
+  $Config::Model::Tk::AnyViewer::VERSION = '1.333';
 }
 
 use strict;

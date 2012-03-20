@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafEditor ;
 {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.332';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.333';
 }
 
 use strict;
@@ -250,7 +250,7 @@ sub store {
     }
     else {
         # trigger redraw of Tk Tree
-        $cw->{store_cb}->($cw->{leaf}) ;
+        $cw->{store_cb}->() ;
         $cw->update_warning($cw->{leaf}) ;
     }
 }

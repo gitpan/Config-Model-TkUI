@@ -10,7 +10,7 @@
 
 package Config::Model::Tk::Wizard ;
 {
-  $Config::Model::Tk::Wizard::VERSION = '1.332';
+  $Config::Model::Tk::Wizard::VERSION = '1.333';
 }
 
 use strict;
