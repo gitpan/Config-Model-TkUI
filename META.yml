@@ -4,12 +4,13 @@ author:
   - 'Dominique Dumont'
 build_requires:
   Module::Build: 0.3601
+  Test::MemoryCycle: 0
   Test::More: 0
   Test::Warn: 0.11
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +19,7 @@ name: Config-Model-TkUI
 recommends:
   Tk::ObjScanner: 0
 requires:
-  Config::Model: 2.001
+  Config::Model: 2.014
   Exception::Class: 0
   File::Slurp: 0
   Log::Log4perl: 1.11
@@ -28,4 +29,4 @@ requires:
   Tk::Pod: 0
   Tk::Tree: 0
   Try::Tiny: 0
-version: 1.333
+version: 1.334

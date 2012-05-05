@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafEditor ;
 {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.333';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.334';
 }
 
 use strict;
@@ -164,15 +164,27 @@ sub cleanup {
 sub add_buttons {
     my ($cw,$frame) = @_ ;
     my $bframe = $frame->Frame->pack() ;
-    $bframe -> Button ( -text => 'Reset',
-                        -command => sub { $cw->reset_value ; },
-                      ) -> pack(-side => 'left') ;
-    $bframe -> Button ( -text => 'Delete',
+
+    my $balloon = $cw->Balloon(-state => 'balloon') ;
+    
+    my $reset_b = $bframe -> Button ( 
+        -text => 'Reset',
+        -command => sub { $cw->reset_value ; },
+    ) -> pack(-side => 'left') ;
+    $balloon->attach($reset_b, -msg => "reset entry value from tree value") ;
+    
+    my $del_label = defined $cw->{leaf}->fetch_standard ? 'Back to default' : 'Delete' ;
+    $bframe -> Button ( -text => $del_label,
                         -command => sub { $cw->delete},
                       ) -> pack(-side => 'left') ;
-    $bframe -> Button ( -text => 'Store',
-                        -command => sub { $cw->store},
-                      ) -> pack(-side => 'right') ;
+    my $store_b = $bframe -> Button (
+        -text => 'Store',
+        -command => sub { $cw->store},
+    ) -> pack(-side => 'right') ;
+    
+    $balloon->attach($store_b, -msg => "store entry value in config tree") ;
+    
+    
     return $bframe ;
 }
 
@@ -290,7 +302,7 @@ sub exec_external_editor {
     my $fh = File::Temp->new ; ;
     die "Can't open temp file:$!" unless defined $fh ;
     binmode($fh,":utf8");
-    $fh->print($cw->{value});
+    $fh->print($cw->{e_widget}->get('1.0','end'));
     $fh->close ;
 
     # See mastering Perl/Tk p382
