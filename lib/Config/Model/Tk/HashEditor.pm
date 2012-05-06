@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::HashEditor;
 {
-  $Config::Model::Tk::HashEditor::VERSION = '1.334';
+  $Config::Model::Tk::HashEditor::VERSION = '1.335';
 }
 
 use strict;

@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 {
-  $Config::Model::TkUI::VERSION = '1.334';
+  $Config::Model::TkUI::VERSION = '1.335';
 }
 
 use 5.10.1 ;
@@ -140,7 +140,7 @@ sub Populate {
 		      [ qw/command reload -command/, sub{ $cw->reload }],
 		      [ command => 'check for errors',    -command => sub{ $cw->check(1)} ],
 		      [ command => 'check for warnings',  -command => sub{ $cw->check(1,1)} ],
-		      [ command => 'show changes',  -command => sub{ $cw->show_changes;} ],
+		      [ command => 'show unsaved changes',  -command => sub{ $cw->show_changes;} ],
 		      [ qw/command save   -command/, sub{ $cw->save }],
 		      [ command => 'save in dir ...',
                         -command => sub{ $cw->save_in_dir ;} ],
@@ -294,10 +294,13 @@ my $pom = $parser->parse_file(__FILE__)
 
 my $help_text;
 my $todo_text;
+my $info_text;
 foreach my $head1 ($pom->head1()) {
     $help_text = Pod::POM::View::Text->view_head1($head1)
-      if $head1->title eq 'USAGE';
-    $todo_text = $head1->content if $head1->title eq 'TODO';
+        if $head1->title eq 'USAGE';
+    $info_text = Pod::POM::View::Text->view_head1($head1)
+        if $head1->title =~ /more information/i ;
+
 }
 
 sub add_help_menu {
@@ -306,15 +309,15 @@ sub add_help_menu {
     my $about_sub = sub {
 	$cw->Dialog(-title => 'About',
 		    -text => "Config::Model::TkUI \n"
-		    ."(c) 2008-2011 Dominique Dumont \n"
+		    ."(c) 2008-2012 Dominique Dumont \n"
 		    ."Licensed under LGPLv2\n"
 		   ) -> Show ;
     };
 
-    my $todo_sub = sub {
+    my $info_sub = sub {
 	my $db = $cw->DialogBox( -title => 'TODO');
-	my $text = $db -> add('ROText')->pack ;
-	$text ->insert('end',$todo_text) ;
+	my $text = $db -> add('Scrolled','ROText')->pack ;
+	$text ->insert('end',$info_text) ;
 	$db-> Show ;
     };
 
@@ -336,8 +339,8 @@ sub add_help_menu {
     };
 
     my $help_items = [[ qw/command About -command/, $about_sub ],
-		      [ qw/command Todo  -command/, $todo_sub  ],
 		      [ qw/command Usage -command/, $help_sub  ],
+		      [ command => 'More info', -command => $info_sub  ],
 		      [ command => "$class help", -command => $man_sub ],
 		     ] ;
     $menubar->cascade( -label => 'Help', -menuitems => $help_items ) ;
@@ -425,7 +428,7 @@ sub save_if_yes {
     my $cw =shift ;
     my $text = shift || "Save data ?" ;
 
-    my $ok_to_quit ;
+    my $ok_to_quit = 1 ;
     if ($cw->{root}->instance->needs_save) {
 	my $answer = $cw->Dialog(-title => "quit",
 				 -text  => $text,
@@ -1209,6 +1212,12 @@ configuration tree. Beware, there's no "undo" operation.
 
 =item *
 
+Before saving your modifications, you can review the change list with the 
+menu entry C<< File -> show unsaved changes >>. This list is cleared after 
+performing a C<< File -> save >>.
+
+=item *
+
 Pasting cut buffer into:
 
 =over
@@ -1261,7 +1270,6 @@ items (mostly missing mandatory values).
 
 =head1 TODO
 
-- Document widget options. (-root_model and -store_sub, -quit)
 - add tabular view ?
 - expand the whole tree at once
 - add plug-in mechanism so that dedicated widget
@@ -1272,9 +1280,27 @@ items (mostly missing mandatory values).
 
 Dominique Dumont, (ddumont at cpan dot org)
 
+=head1 More information
+
+=over
+
+=item *
+
+See L<Config::Model home page|https://github.com/dod38fr/config-model/wiki>
+
+=item *
+
+Or L<Author's blog|http://ddumont.wordpress.com> where you can find many post about L<Config::Model>.
+
+=item *
+
+Send a mail to Config::Model user mailing list: config-model-users at lists.sourceforge.net
+
+=back
+
 =head1 LICENSE
 
-    Copyright (c) 2008-2011 Dominique Dumont.
+    Copyright (c) 2008-2012 Dominique Dumont.
 
     This file is part of Config-Model.
 
