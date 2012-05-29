@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::HashViewer ;
 {
-  $Config::Model::Tk::HashViewer::VERSION = '1.335';
+  $Config::Model::Tk::HashViewer::VERSION = '1.336';
 }
 
 use strict;
@@ -54,7 +54,7 @@ sub Populate {
 				     -height => 10,
 				   ) ->pack(@fbe1) ;
 
-    foreach my $c ($hash->get_all_indexes) {
+    foreach my $c ($hash->fetch_all_indexes) {
 	$rt->insert('end', $c."\n" ) ;
     }
 

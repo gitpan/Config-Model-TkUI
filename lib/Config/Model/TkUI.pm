@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 {
-  $Config::Model::TkUI::VERSION = '1.335';
+  $Config::Model::TkUI::VERSION = '1.336';
 }
 
 use 5.10.1 ;
@@ -466,7 +466,10 @@ sub show_changes {
     
     my $changes = $cw->{root}->instance->list_changes ;
     my $change_widget = $cw->Toplevel ;
-    $change_widget->Scrolled('ROText')->pack ->insert('1.0',$changes);
+    $change_widget
+        -> Scrolled('ROText')
+        -> pack(-expand => 1, -fill => 'both')
+        -> insert('1.0',$changes);
     $change_widget->Button(
         -command => sub {$change_widget->destroy; $cb ->() if defined $cb;} ,
         -text => 'ok',

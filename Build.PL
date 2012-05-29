@@ -41,7 +41,7 @@ my $build = Module::Build->new
 
   'build_requires' => {
     'Module::Build' => '0.3601',
-    'Test::MemoryCycle' => '0',
+    'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0.11'
   },
@@ -52,7 +52,7 @@ my $build = Module::Build->new
     'Tk::ObjScanner' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.014',
+    'Config::Model' => '2.017',
     'Exception::Class' => '0',
     'File::Slurp' => '0',
     'Log::Log4perl' => '1.11',

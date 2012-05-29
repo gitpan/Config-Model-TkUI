@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::HashEditor;
 {
-  $Config::Model::Tk::HashEditor::VERSION = '1.335';
+  $Config::Model::Tk::HashEditor::VERSION = '1.336';
 }
 
 use strict;
@@ -96,7 +96,7 @@ sub Populate {
         -height     => 6,
     );
     $tklist->pack( @fbe1, -side => 'left' );
-    $tklist->insert( end => $hash->get_all_indexes );
+    $tklist->insert( end => $hash->fetch_all_indexes );
     $cw->Advertise( tklist => $tklist );
 
     my $item_frame =
@@ -294,7 +294,7 @@ sub add_entry {
         return 0;
     }
 
-    $logger->debug( "new hash idx: " . join( ',', $hash->get_all_indexes ) );
+    $logger->debug( "new hash idx: " . join( ',', $hash->fetch_all_indexes ) );
 
     # ensure correct order for ordered hash
     my @selected = $tklist->curselection();
