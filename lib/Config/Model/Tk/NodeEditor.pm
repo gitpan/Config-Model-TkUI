@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NodeEditor ;
 {
-  $Config::Model::Tk::NodeEditor::VERSION = '1.336';
+  $Config::Model::Tk::NodeEditor::VERSION = '1.337';
 }
 
 use strict;

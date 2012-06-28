@@ -31,7 +31,8 @@ $show               = 1 if $arg =~ /s|i/;
 
 print "You can play with the widget if you run the test with 's' argument\n";
 
-my $log4perl_user_conf_file = $ENV{HOME}.'/.log4config-model' ;
+my $home = $ENV{HOME} || '';
+my $log4perl_user_conf_file = "$home/.log4config-model";
 
 if ($log and -e $log4perl_user_conf_file ) {
     Log::Log4perl::init($log4perl_user_conf_file);
@@ -175,7 +176,7 @@ SKIP: {
 
 	 # warn test, 3 warnings: load, fetch for hlist, fetch for editor
 	 sub { warnings_like { $root->load("always_warn=foo") ; $cmu->reload ;}
-	       [ ( qr/always/ ) x 3 ] ,"warn test always_warn 2 ".$idx++ ;
+	       [ ( qr/always/ ) x 2 ] ,"warn test always_warn 2 ".$idx++ ;
 	     },
 	 sub { $root->load('always_warn~') ; $cmu->reload ;; ok(1,"test remove always_warn ".$idx++)},
 
@@ -185,7 +186,7 @@ SKIP: {
 	     },
 
 	 sub { warnings_like { $root->load("warn_unless=bar") ; $cmu->reload ;}
-	       [ ( qr/warn_unless/ ) x 3 ] ,"warn test warn_unless ".$idx++ ;
+	       [ ( qr/warn_unless/ ) x 2 ] ,"warn test warn_unless ".$idx++ ;
 	     },
 	 sub { $root->load('warn_unless=foo2') ; $cmu->reload ;; ok(1,"test fix warn_unless ".$idx++)},
          sub { $cmu ->show_changes ;} ,
