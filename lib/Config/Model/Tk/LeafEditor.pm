@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::LeafEditor ;
 {
-  $Config::Model::Tk::LeafEditor::VERSION = '1.337';
+  $Config::Model::Tk::LeafEditor::VERSION = '1.338';
 }
 
 use strict;
@@ -330,7 +330,7 @@ sub exec_external_editor {
     
     $cw->grabRelease; 
     
-    my $new_v = read_file($fh->filename) ;
+    my $new_v = read_file($fh->filename, binmode => ':utf8') ;
     print "exec_external_editor done with '$new_v'\n";
     $cw->store($new_v);
     $cw->reset_value ;

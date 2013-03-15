@@ -3,8 +3,10 @@ ChangeLog
 LICENSE
 MANIFEST
 MANIFEST.SKIP
+META.json
 META.yml
 README
+README.build-from-git
 examples/model.pl
 lib/Config/Model/Tk/AnyViewer.pm
 lib/Config/Model/Tk/CheckListEditor.pm

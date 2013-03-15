@@ -40,13 +40,13 @@ my $build = Module::Build->new
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
 
   'build_requires' => {
-    'Module::Build' => '0.3601',
+    'Module::Build' => '0.34',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0.11'
   },
   'configure_requires' => {
-    'Module::Build' => '0.3601'
+    'Module::Build' => '0.34'
   },
   'recommends' => {
     'Tk::ObjScanner' => '0'
