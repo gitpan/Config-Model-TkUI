@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 {
-  $Config::Model::TkUI::VERSION = '1.338';
+  $Config::Model::TkUI::VERSION = '1.339';
 }
 
 use 5.10.1 ;

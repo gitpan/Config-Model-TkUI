@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "AnyEvent" : "0",
             "Module::Build" : "0.34",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
@@ -37,7 +38,7 @@
             "Tk::ObjScanner" : "0"
          },
          "requires" : {
-            "Config::Model" : "2.017",
+            "Config::Model" : "2.030",
             "Exception::Class" : "0",
             "File::Slurp" : "0",
             "Log::Log4perl" : "1.11",
@@ -63,6 +64,6 @@
          "web" : "https://github.com/dod38fr/config-model-tkui"
       }
    },
-   "version" : "1.338"
+   "version" : "1.339"
 }
 

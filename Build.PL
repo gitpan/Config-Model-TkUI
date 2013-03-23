@@ -40,6 +40,7 @@ my $build = Module::Build->new
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
 
   'build_requires' => {
+    'AnyEvent' => '0',
     'Module::Build' => '0.34',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
@@ -52,7 +53,7 @@ my $build = Module::Build->new
     'Tk::ObjScanner' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.017',
+    'Config::Model' => '2.030',
     'Exception::Class' => '0',
     'File::Slurp' => '0',
     'Log::Log4perl' => '1.11',
