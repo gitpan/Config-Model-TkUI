@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2011 by Dominique Dumont.
+# This software is Copyright (c) 2013 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -321,6 +321,14 @@ things.
                 help   => { map { ( $_ => "$_ help") ;} ('AA' .. 'AE') },
                 description =>
                   'my_plain_check_list nto so helpfull description',
+            },
+            enum_with_help_and_long_desc => {
+                type   => 'leaf',
+                value_type => 'enum' ,
+                choice => [ 'AA' .. 'AE' ],
+                help   => { map { ( $_ => "$_ help") ;} ('AA' .. 'AE') },
+                description =>
+                  "my_plain_check_list not so helpful\n even if long description",
             },
            my_ref_check_list => {
                 type     => 'check_list',

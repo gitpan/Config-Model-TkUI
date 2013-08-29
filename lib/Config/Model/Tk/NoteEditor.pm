@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2011 by Dominique Dumont.
+# This software is Copyright (c) 2013 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::NoteEditor ;
 {
-  $Config::Model::Tk::NoteEditor::VERSION = '1.339';
+  $Config::Model::Tk::NoteEditor::VERSION = '1.340';
 }
 
 use strict;

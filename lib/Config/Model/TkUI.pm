@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2011 by Dominique Dumont.
+# This software is Copyright (c) 2013 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -11,7 +11,7 @@
 
 package Config::Model::TkUI ;
 {
-  $Config::Model::TkUI::VERSION = '1.339';
+  $Config::Model::TkUI::VERSION = '1.340';
 }
 
 use 5.10.1 ;
@@ -552,7 +552,7 @@ sub on_cut_buffer_dump {
 
     if ($obj->isa('Config::Model::Value')) {
 	# if leaf store content
-	$obj->store($sel)
+	$obj->store(value => $sel, callback => sub {$cw->reload;}) ;
     }
     elsif ($obj->isa('Config::Model::HashId')) {
 	# if hash create keys

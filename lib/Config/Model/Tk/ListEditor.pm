@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2011 by Dominique Dumont.
+# This software is Copyright (c) 2013 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 package Config::Model::Tk::ListEditor ;
 {
-  $Config::Model::Tk::ListEditor::VERSION = '1.339';
+  $Config::Model::Tk::ListEditor::VERSION = '1.340';
 }
 
 use strict;
@@ -93,6 +93,7 @@ sub Populate {
     $cw->ConfigModelNoteEditor( -object => $list )->pack;
     $cw->add_summary($list)->pack(@fx);
     $cw->add_description($list)->pack(@fx);
+    $cw->add_warning($list, 'edit')->pack(@fx) ;
     $cw->add_info_button($cw)->pack(@fx);
 
     my $mv_rm_frame = $right_frame->Frame->pack(@fx);

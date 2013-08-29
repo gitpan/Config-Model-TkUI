@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.132140",
    "license" : [
       "lgpl_2_1"
    ],
@@ -64,6 +64,6 @@
          "web" : "https://github.com/dod38fr/config-model-tkui"
       }
    },
-   "version" : "1.339"
+   "version" : "1.340"
 }
 

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2011 by Dominique Dumont.
+# This software is Copyright (c) 2013 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -27,7 +27,7 @@
 
 package Config::Model::Tk::AnyViewer ;
 {
-  $Config::Model::Tk::AnyViewer::VERSION = '1.339';
+  $Config::Model::Tk::AnyViewer::VERSION = '1.340';
 }
 
 use strict;
@@ -131,8 +131,8 @@ sub add_help {
     chomp $help ;
 #    if (  $force_text_widget eq 'pod' or $help =~ /\n=\w+|[A-Z]</ ) {
     if ($force_text_widget or $help =~ /\n/ or length($help) > 50) {
-        $widget = $help_frame->PodText;
-        $widget ->pack( @fbe1 ) ;
+        $widget = $help_frame->PodText(-height => 5, -scrollbars  => 'oe');
+        $widget ->pack( @fxe1 ) ;
         $cw->update_help($widget, $help) ;
     }
     # elsif ($force_text_widget or $help =~ /\n/ or length($help) > 50) {
