@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -26,10 +26,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 package Config::Model::Tk::AnyViewer ;
-{
-  $Config::Model::Tk::AnyViewer::VERSION = '1.340';
-}
-
+$Config::Model::Tk::AnyViewer::VERSION = '1.341';
 use strict;
 use warnings ;
 use Carp ;
@@ -148,7 +145,7 @@ sub add_help {
         # $widget
           # ->tagConfigure(qw/help -lmargin1 2 -lmargin2 2 -rmargin 2/);
     # }
-    else {
+    elsif ($help =~ /\w/) {
         $widget = $help_frame->Label( -text => $help,
                                       -justify => 'left',
                                       -font => $text_font ,

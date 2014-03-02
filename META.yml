@@ -3,35 +3,35 @@ abstract: 'Tk GUI to edit config data through Config::Model'
 author:
   - 'Dominique Dumont'
 build_requires:
-  AnyEvent: 0
-  Module::Build: 0.34
-  Test::Memory::Cycle: 0
-  Test::More: 0
-  Test::Warn: 0.11
+  AnyEvent: '0'
+  Module::Build: '0.34'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+  Test::Warn: '0.11'
 configure_requires:
-  Module::Build: 0.34
+  Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Config-Model-TkUI
 recommends:
-  Tk::ObjScanner: 0
+  Tk::ObjScanner: '0'
 requires:
-  Config::Model: 2.030
-  Exception::Class: 0
-  File::Slurp: 0
-  Log::Log4perl: 1.11
-  Pod::POM: 0
-  Tk: 0
-  Tk::DirSelect: 0
-  Tk::Pod: 0
-  Tk::Tree: 0
-  Try::Tiny: 0
+  Config::Model: '2.050'
+  Exception::Class: '0'
+  File::Slurp: '0'
+  Log::Log4perl: '1.11'
+  Pod::POM: '0'
+  Tk: '0'
+  Tk::DirSelect: '0'
+  Tk::Pod: '0'
+  Tk::Tree: '0'
+  Try::Tiny: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-TkUI
   homepage: https://github.com/dod38fr/config-model-tkui/wiki
   repository: git://github.com/dod38fr/config-model-tkui.git
-version: 1.340
+version: '1.341'

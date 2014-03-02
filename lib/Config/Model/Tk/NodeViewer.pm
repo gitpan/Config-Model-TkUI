@@ -1,17 +1,14 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeViewer ;
-{
-  $Config::Model::Tk::NodeViewer::VERSION = '1.340';
-}
-
+$Config::Model::Tk::NodeViewer::VERSION = '1.341';
 use strict;
 use warnings ;
 use Carp ;

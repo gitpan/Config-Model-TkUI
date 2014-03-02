@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,10 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI ;
-{
-  $Config::Model::TkUI::VERSION = '1.340';
-}
-
+$Config::Model::TkUI::VERSION = '1.341';
 use 5.10.1 ;
 use strict;
 use warnings ;
@@ -443,11 +440,12 @@ sub save_if_yes {
 				 -buttons => [ qw/yes no cancel/, 'show changes'],
 				 -default_button => 'yes',
 				)->Show ;
-	given ($answer) {
-            when ('yes') { $cw->save; $ok_to_quit = 1 ;}
-            when ('no')  {            $ok_to_quit = 1 ;}
-            when ('cancel')  {            $ok_to_quit = 0 ;}
-            when (/show/)  { $cw->show_changes(sub{$cw -> save_if_yes}) ;  $ok_to_quit = 0 ;}
+	if    ($answer eq 'yes')    { $cw->save; $ok_to_quit = 1 ;}
+	elsif ($answer eq 'no')     {            $ok_to_quit = 1 ;}
+	elsif ($answer eq 'cancel') {            $ok_to_quit = 0 ;}
+	elsif ($answer =~ /show/)   {
+            $cw->show_changes(sub{$cw -> save_if_yes}) ;
+            $ok_to_quit = 0 ;
 	}
     }
 
@@ -835,13 +833,15 @@ sub disp_leaf {
     my $value = $leaf_object->fetch(check => 'no', silent => 1) ;
     my $tkt = $cw->{tktree} ;
 
-    my ($is_customised, $img) ;
+    my ($is_customised, $img,$has_error,$has_warning) ;
     {
 	no warnings qw/uninitialized/ ;
-        $is_customised = ! ( $std_v eq $value)  ;
+        $is_customised = !! ( defined $value and ( $std_v ne $value ))  ;
 	$img = $cust_img if $is_customised ;
-	$img = $warn_img if $leaf_object->warning_msg ;
-	$img = $error_img if $leaf_object->error_msg;
+	$has_warning = !! $leaf_object->warning_msg ;
+	$img = $warn_img if $has_warning ;
+	$has_error = !! $leaf_object->error_msg;
+	$img = $error_img if $has_error;
     }
 
     if (defined $img) {
@@ -859,7 +859,7 @@ sub disp_leaf {
 
     $tkt->itemCreate($path,3, -text => $cw->trim_value($std_v)) ;
     
-    my $meth = ($cw->{show_only_custom} and not $is_customised) ? 'hide' : 'show' ;
+    my $meth = ($cw->{show_only_custom} and not ($is_customised or $has_error or $has_warning)) ? 'hide' : 'show' ;
     $tkt->$meth(entry => $path) ; 
 }
 
