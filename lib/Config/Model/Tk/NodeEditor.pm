@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeEditor ;
-$Config::Model::Tk::NodeEditor::VERSION = '1.341';
+$Config::Model::Tk::NodeEditor::VERSION = '1.342';
 use strict;
 use warnings ;
 use Carp ;

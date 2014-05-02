@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::ListViewer ;
-$Config::Model::Tk::ListViewer::VERSION = '1.341';
+$Config::Model::Tk::ListViewer::VERSION = '1.342';
 use strict;
 use warnings ;
 use Carp ;
@@ -51,7 +51,7 @@ sub Populate {
 				   ) ->pack(@fbe1) ;
 
     my @insert = $list->cargo_type eq 'leaf' ? $list->fetch_all_values (check => 'no')
-               :                         $list->get_all_indexes ;
+               :                         $list->fetch_all_indexes ;
     foreach my $c (@insert) {
 	my $line = defined $c ? $c : '<undef>' ;
 	$rt->insert('end', $line."\n" ) ;

@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI ;
-$Config::Model::TkUI::VERSION = '1.341';
+$Config::Model::TkUI::VERSION = '1.342';
 use 5.10.1 ;
 use strict;
 use warnings ;

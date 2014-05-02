@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::ListEditor ;
-$Config::Model::Tk::ListEditor::VERSION = '1.341';
+$Config::Model::Tk::ListEditor::VERSION = '1.342';
 use strict;
 use warnings ;
 use Carp ;
@@ -147,9 +147,10 @@ sub Populate {
 
         my $set_push_b_frame = $set_push_b_entry_frame->Frame ->pack(@fxe1) ;
 
-        $cw->add_set_entry ( $set_push_b_frame, $balloon, $tklist,\$user_value )->pack(@fxe1);
-        $cw->add_push_entry( $set_push_b_frame, $balloon ,\$user_value)->pack(@fxe1);
-        $cw->add_set_all_b ( $set_push_b_entry_frame, $set_push_b_frame, $balloon ,\$user_value)
+        $cw->add_set_entry   ( $set_push_b_frame, $balloon, $tklist,\$user_value )->pack(@fxe1);
+        $cw->add_insort_entry( $set_push_b_frame, $balloon, \$user_value )->pack(@fxe1);
+        $cw->add_insert_entry( $set_push_b_frame, $balloon, \$user_value)->pack(@fxe1);
+        $cw->add_set_all_b   ( $set_push_b_entry_frame, $set_push_b_frame, $balloon ,\$user_value)
             ->pack(@fxe1);
 
 	$value_entry -> pack  (@fxe1) ;
@@ -188,7 +189,7 @@ sub reset_value {
     my @insert =
         $cargo_type eq 'leaf'
       ? $list->fetch_all_values( check => 'no' )
-      : $list->get_all_indexes;
+      : $list->fetch_all_indexes;
     map { $_ = '<undef>' unless defined $_ } @insert;
     $cw->{tklist}->insert( end => @insert );
 
@@ -201,7 +202,7 @@ sub add_set_entry {
     my $set_sub = sub { $cw->set_entry($$user_value_r); };
 
     my $set_b = $frame->Button(
-        -text    => "set selected item",
+        -text    => "set selected",
         -command => $set_sub,
     )->pack( -side => 'left', @fxe1 );
 
@@ -243,20 +244,12 @@ sub push_entry {
 
     $logger->debug("push_entry: $add");
 
-    my $cargo_type = $list->cargo_type ;
-    my $value_type = $list->get_cargo_info('value_type') ; # may be undef
-    if ($cargo_type eq 'leaf' and $value_type ne 'enum' and $value_type ne 'reference') {
-	return unless length($add);
-	eval {$list->push($add) ;};
-    }
-    else {
-	# create new item in list (may auto create node object)
-	my @idx = $list -> get_all_indexes ;
-	eval {$list->fetch_with_id(scalar @idx)} ;
-    }
+    # create new item in list (may auto create node object)
+    my @idx = $list -> fetch_all_indexes ;
+    eval {$list->fetch_with_id(scalar @idx)} ;
 
     if ($@) {
-	$cw -> Dialog ( -title => "List index error with type $cargo_type",
+	$cw -> Dialog ( -title => "List index error",
 			-text  => $@->as_string,
 		      )
 	  -> Show ;
@@ -265,7 +258,7 @@ sub push_entry {
 	# trigger redraw of Tk Tree
 	$cw->{store_cb}->();
 
-        my @new_idx = $list->get_all_indexes ;
+        my @new_idx = $list->fetch_all_indexes ;
         $logger->debug("new list idx: ". join(',',@new_idx));
 
         my $insert = length($add) ? $add : $#new_idx ;
@@ -273,6 +266,39 @@ sub push_entry {
     }
 
     return 1 ;
+}
+
+sub add_insert_entry {
+    my ( $cw, $frame, $balloon, $user_value_r ) = @_;
+
+    my $insert_sub  = sub { $cw->insert_entry($$user_value_r); $$user_value_r = ''; };
+    my $insert_b    = $frame->Button(
+        -text    => "insert item",
+        -command => $insert_sub,
+    )->pack( -side => 'left', @fxe1 );
+
+    $balloon->attach( $insert_b,
+        -msg => 'enter a value, and click the insert button to add '
+          . 'this value before the selected item or at the end of the list (push)' );
+    return $insert_b;
+}
+
+sub insert_entry {
+    my $cw = shift;
+    my $add = shift;
+    my $tklist = $cw->{tklist} ;
+    my $list = $cw->{list};
+
+    my $idx_ref = $tklist->curselection || [];
+    my $idx = $idx_ref->[0] ;
+
+    $logger->debug("insert_entry: $add insert at index ", $idx || 'end');
+    print("insert_entry: $add insert at index ", $idx || 'end',"\n");
+
+    return unless length($add);
+    my $try_sub = defined $idx ? sub {$list->insert_at($idx,$add) ;} : sub {$list->push($add)} ;
+    $cw->try_and_redraw( $try_sub );
+
 }
 
 sub set_entry {
@@ -291,6 +317,58 @@ sub set_entry {
     $tklist->selectionSet($idx ) ;
     $cw->{list}->fetch_with_id($idx)->store($data) ;
     $cw->{store_cb}->() ;
+}
+
+sub add_insort_entry {
+    my ( $cw, $frame, $balloon, $user_value_r ) = @_;
+
+    my $insort_sub  = sub { $cw->insort_entry($$user_value_r); $$user_value_r = ''; };
+    my $insort_b    = $frame->Button(
+        -text    => "insort",
+        -command => $insort_sub,
+    )->pack( -side => 'left', @fxe1 );
+
+    $balloon->attach( $insort_b,
+        -msg => 'enter a value, and click the insort button to insert '
+          . 'this value while keeping the list sorted' );
+    return $insort_b;
+}
+
+sub insort_entry {
+    my $cw = shift;
+    my $add = shift;
+
+    $logger->debug("insort_entry: $add");
+
+    return unless length($add);
+    $cw->try_and_redraw( sub {$cw->{list}->insort($add) ;})
+}
+
+sub try_and_redraw {
+    my $cw = shift;
+    my $to_try = shift;
+    my $tklist = $cw->{tklist} ;
+    my $list = $cw->{list};
+
+    eval {$to_try->() ;};
+
+    if ($@) {
+	$cw -> Dialog ( -title => "List index error",
+			-text  => $@->as_string,
+		      )
+	  -> Show ;
+    }
+    else {
+	# trigger redraw of Tk Tree
+	$cw->{store_cb}->();
+
+        my @list = $list->fetch_all_values ;
+
+        $tklist->delete(0,'end') ;
+        $tklist->insert(0, @list) ;
+    }
+
+    return 1 ;
 }
 
 sub add_set_all_b {
@@ -345,12 +423,12 @@ sub sort_content {
 
     my $tklist = $cw->{tklist} ;
     my $list = $cw->{list} ;
+    $list->sort ;
 
-    my @list = sort $list->fetch_all_values ;
+    my @list = $list->fetch_all_values ;
 
     $tklist->delete(0,'end') ;
     $tklist->insert(0, @list) ;
-    $list->load_data(\@list) ;
     $cw->{store_cb}->() ;
 }
 
@@ -428,7 +506,7 @@ sub remove_selection {
     $tklist -> delete(0,'end') ;
     my $cargo_type = $list->cargo_type ;
     my @insert = $cargo_type eq 'leaf' ? $list->fetch_all_values (check => 'no')
-               :                         $list->get_all_indexes ;
+               :                         $list->fetch_all_indexes ;
     map { $_ = '<undef>' unless defined $_ } @insert ;
     $tklist->insert( end => @insert ) ;
     $cw->update_warning($list) ;

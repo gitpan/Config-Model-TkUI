@@ -26,7 +26,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 package Config::Model::Tk::AnyViewer ;
-$Config::Model::Tk::AnyViewer::VERSION = '1.341';
+$Config::Model::Tk::AnyViewer::VERSION = '1.342';
 use strict;
 use warnings ;
 use Carp ;
