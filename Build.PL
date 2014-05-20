@@ -40,6 +40,7 @@ my $build = Module::Build->new
    dist_author  => "Dominique Dumont (ddumont at cpan dot org)",
 
   'build_requires' => {
+    'Config::Model::Value' => '0',
     'Module::Build' => '0.34',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
@@ -48,20 +49,36 @@ my $build = Module::Build->new
   'configure_requires' => {
     'Module::Build' => '0.34'
   },
-  'recommends' => {
-    'Tk::ObjScanner' => '0'
-  },
   'requires' => {
+    'Carp' => '0',
     'Config::Model' => '2.052',
-    'Exception::Class' => '0',
-    'File::Slurp' => '0',
+    'Config::Model::ObjTreeScanner' => '0',
     'Log::Log4perl' => '1.11',
+    'Path::Tiny' => '0',
     'Pod::POM' => '0',
+    'Pod::POM::View::Text' => '0',
+    'Scalar::Util' => '0',
+    'Text::Wrap' => '0',
     'Tk' => '0',
+    'Tk::Adjuster' => '0',
+    'Tk::Balloon' => '0',
+    'Tk::BrowseEntry' => '0',
+    'Tk::Dialog' => '0',
+    'Tk::DialogBox' => '0',
     'Tk::DirSelect' => '0',
+    'Tk::Frame' => '0',
+    'Tk::Menubutton' => '0',
+    'Tk::NoteBook' => '0',
+    'Tk::PNG' => '0',
+    'Tk::Pane' => '0',
+    'Tk::Photo' => '0',
     'Tk::Pod' => '0',
+    'Tk::Pod::Text' => '0',
+    'Tk::ROText' => '0',
+    'Tk::Toplevel' => '0',
     'Tk::Tree' => '0',
-    'Try::Tiny' => '0'
+    'Try::Tiny' => '0',
+    'perl' => '5.010'
   },
 
    add_to_cleanup => [qw/stderr.log wr_data/] ,
